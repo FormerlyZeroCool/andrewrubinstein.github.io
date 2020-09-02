@@ -132,11 +132,12 @@ async function updateDataInclude(){
     const element = document.getElementById(`include-${path}`);
     if(element)
     {
-        const data = await getDataJson(`/${path}`);
+        const data = await getDataJson(`/blogposts_index.json`);
         element.innerHTML = jsListToHtml(data)+'\n'+element.innerHTML;
     }
 }
 document.addEventListener('DOMContentLoaded',() => {
     includeHTML('partials/navigation');
     includeHTML('partials/contact');
+    updateDataInclude();
 })
