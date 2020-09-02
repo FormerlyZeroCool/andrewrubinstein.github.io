@@ -122,7 +122,7 @@ function jsListToHtml(list){
     let html = "<ul>";
     for(element of list)
     {
-      html += `<li>${element.message}</li>`;
+      html += `<li>${element.fileName}</li>`;
     }
     html += "</ul>";
     return html
@@ -133,6 +133,7 @@ async function updateDataInclude(){
     if(element)
     {
         const data = await getDataJson(`/blogposts_index.json`);
+        console.log(data);
         element.innerHTML = jsListToHtml(data)+'\n'+element.innerHTML;
     }
 }
