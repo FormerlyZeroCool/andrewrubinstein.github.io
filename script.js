@@ -122,7 +122,7 @@ function jsListToHtml(list){
     let html = "<ul>";
     for(element of list)
     {
-      html += `<li><a href="${element.fileName}">${element.fileName.substring(0,fileName.length-5)}</a></li>`;
+      html += `<li><a href="/blogposts/${element.fileName}">${element.fileName.substring(0,fileName.length-5)}</a></li>`;
     }
     html += "</ul>";
     return html
