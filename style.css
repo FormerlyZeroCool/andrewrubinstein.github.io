@@ -142,9 +142,9 @@
 	text-align: center;
 	text-decoration: none;
 	display: inline-block;
-	font-size: 75%;
+	font-size: 85%;
 }
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1110px) {
 .button {
 	background-color: rgb(0, 0, 0);
 	/* Black */
