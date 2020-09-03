@@ -12,11 +12,12 @@ class Object(object):
 for x in arr:
     file = open(filepath+os.path.sep+x,'r')
     data = file.read()
-    p = Object()
-    p.title = (data[data.find('<title>')+7:data.find('</title>')]).replace('\n','')
-    p.desc = (data[data.find('<desc hidden>')+13:data.find('</desc>')]).replace('\n','')
-    p.name = x
-    dataArr.append(p)
+    if data.find('<desc hidden>') != -1:
+        p = Object()
+        p.title = (data[data.find('<title>')+7:data.find('</title>')]).replace('\n','')
+        p.desc = (data[data.find('<desc hidden>')+13:data.find('</desc>')]).replace('\n','')
+        p.name = x
+        dataArr.append(p)
 json = ''
 for x in dataArr:
     json += '{"fileName":"' + x.name + '","title":"' + x.title + '","desc":"' + x.desc + '"},'
