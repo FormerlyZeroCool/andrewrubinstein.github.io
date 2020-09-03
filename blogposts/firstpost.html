@@ -14,48 +14,47 @@
     <div id="include-partials/navigation"></div>
        
             <div class="text-container" style="text-align:left">
+                <p>Why Recursion is effectively implemented iteratively with stacks:</p>
+
+                <p>Abstract:<br>
+                This paper will discuss the effective implementation of recursion iteratively with the use of stacks. This is necessary in computer science as modern computational models work based upon iterative computation, and cannot innately recurs. Recursion is defined as follows by the Stanford Encyclopedia of Philosophy:<br>
+                &ldquo;The recursive functions are characterized by the process in virtue of which the value of a function for some argument is defined in terms of the value of that function for some other (in some appropriate sense &ldquo;smaller&rdquo;) arguments, as well as the values of certain other functions.&rdquo;<br>
+                The process is reliant upon arriving at a state simple enough to provide a solution without any further calculation. These states are referred to as base cases or initial functions. This paper will illustrate the elegance of using the stack data structure with its last in first out properties to represent these intermediary states until a base case is arrived at, and then its usefulness in reverting back through all these recursive cases to perform the calculations necessary to arrive at the solution described in the recursive definition iteratively.</p>
+                
+                <p>Introduction:<br>
+                This research paper is an illustration of the reasons to use the stack data structure to simulate recursion, or to allow for the abstraction of the iterative process computer hardware goes through instead of recursion. Recursion is an important aspect of computer science as it allows for simpler function definitions, and therefore less opportunity for software bugs. This paper will rely on other past proofs pertaining to lambda calculus as a Turing complete model that can represent any recursive function, as well as the definition of the properties of the Stack data structure</p>
+                
+                <p>Problem Motivation: <br>
+                As it currently stands there are no papers that directly address this topic. The reason for this research is to provide an academic explanation for reference as to why the Stack data structure is currently the standard in modern programming languages for implementing recursive algorithms.</p>
+                
+                <p>Solution:<br>
+                The Lamdba calculus has already proven that all computable operations can be expressed by composing functions of other functions, the concept of recursion, and starts from three base functions, plus another minimization function. The first and simplest of these functions is the constant function. This function always has the same output for every input, and example of the use of a constant function can is the zero constant function that always has an output of 0, and can be used as part of the recursive definition of natural numbers z(x):<br>
+                A natural number is any number where n+1 is also a natural number, with the base case of zero. <br>
+                It should be clear from that definition that the constant function whose output is zero can be used to express the base case described above.</p>
+                
                 <p>
-                Why Recursion is effectively implemented iteratively with stacks:<br>
-<br>
-                Abstract:<br>
-                This paper will discuss the effective implementation of recursion iteratively with the use of stacks. This is necessary in computer science as modern computational models work based upon iterative computation, and cannot innately recurs. Recursion is defined as follows by the Stanford Encyclopedia of Philosophy:
-                “The recursive functions are characterized by the process in virtue of which the value of a function for some argument is defined in terms of the value of that function for some other (in some appropriate sense “smaller”) arguments, as well as the values of certain other functions.”
-                The process is reliant upon arriving at a state simple enough to provide a solution without any further calculation.  These states are referred to as base cases or initial functions. This paper will illustrate the elegance of using the stack data structure with its last in first out properties to represent these intermediary states until a base case is arrived at, and then its usefulness in reverting back through all these recursive cases to perform the calculations necessary to arrive at the solution described in the recursive definition iteratively.
-                <br>
-                Introduction:
-                This research paper is an illustration of the reasons to use the stack data structure to simulate recursion, or to allow for the abstraction of the iterative process computer hardware goes through instead of recursion. Recursion is an important aspect of computer science as it allows for simpler function definitions, and therefore less opportunity for software bugs. This paper will rely on other past proofs pertaining to lambda calculus as a Turing complete model that can represent any recursive function, as well as the definition of the properties of the Stack data structure
-                <br>
-                Problem Motivation: 
-                As it currently stands there are no papers that directly address this topic. The reason for this research is to provide an academic explanation for reference as to why the Stack data structure is currently the standard in modern programming languages for implementing recursive algorithms.
-                <br>
-                Solution:
-                The Lamdba calculus has already proven that all computable operations can be expressed by composing functions of other functions, the concept of recursion, and starts from three base functions, plus another minimization function.  The first and simplest of these functions is the constant function.  This function always has the same output for every input, and example of the use of a constant function can is the zero constant function that always has an output of 0, and can be used as part of the recursive definition of natural numbers z(x):
-                A natural number is any number where n+1 is also a natural number, with the base case of zero. 
-                It should be clear from that definition that the constant function whose output is zero can be used to express the base case described above.
-                <br>
-                <br>
-                [Stanford]  The second function is the successor function as defined by the Stanford Encyclopedia it is a function that for any input it returns the successor to that input.  For example the successor function used to define natural numbers is:
-                f(input) = input + 1, which as we see above is already used in the recursive definition of natural numbers. 
-                Which brings us to the next basic function, the predecessor function this function takes any input within its domain, and returns its predecessor, and can be defined recursively as the predecessor of 0 is 0, and for all other inputs greater than 0 it can be defined with the following function pd(n) = pd(n-1)+1. [Stanford]  
-                <br>
-                It has been proven by Alonzo Church that by combining these three functions through functional composition, and iteration the repeated composition of functions that any primitive recursive function can be expressed.  
-                <br>
-                To elaborate through function iteration we can describe multiplication, exponentiation, tetration, and any other hyper-operation* if we combine iteration expressed as functional composition in Lambda calculus with these functions we can describe addition by x as: f(x) = (x+1) were the degree of composition is the first summand, and the function’s input, or x is the second so 2+2 can be expressed as f(f(x)), or f^2(x) (not to be confused for exponentiation) where x is 2.  Furthermore we can replace the inputs with constant functions representing each of the summands, and each of the constant functions can be defined by iterating the successor function on the zero constant function.  This methodology can be extended using nested iteration to achieve the aforementioned operations of exponentiation, and tetration. As such these functions can also all be defined with primitive recursive definitions. 
-                <br>
-                But of course there are recursive functions that are not primitive recursive the first person to provide a function that illustrates this was Willhelm Ackermann who created a total function that is not primitive recursive known as Ackermann’s function.  This function is recursively defined as 
-                <br>if x = 0  f(x,y) = y+1<br>
+                [Stanford] The second function is the successor function as defined by the Stanford Encyclopedia it is a function that for any input it returns the successor to that input. For example the successor function used to define natural numbers is:<br>
+                f(input) = input + 1, which as we see above is already used in the recursive definition of natural numbers. <br>
+                Which brings us to the next basic function, the predecessor function this function takes any input within its domain, and returns its predecessor, and can be defined recursively as the predecessor of 0 is 0, and for all other inputs greater than 0 it can be defined with the following function pd(n) = pd(n-1)+1. [Stanford]</p>
+                
+                <p>It has been proven by Alonzo Church that by combining these three functions through functional composition, and iteration the repeated composition of functions that any primitive recursive function can be expressed.</p>
+                
+                <p>To elaborate through function iteration we can describe multiplication, exponentiation, tetration, and any other hyper-operation* if we combine iteration expressed as functional composition in Lambda calculus with these functions we can describe addition by x as: f(x) = (x+1) were the degree of composition is the first summand, and the function&rsquo;s input, or x is the second so 2+2 can be expressed as f(f(x)), or f^2(x) (not to be confused for exponentiation) where x is 2. Furthermore we can replace the inputs with constant functions representing each of the summands, and each of the constant functions can be defined by iterating the successor function on the zero constant function. This methodology can be extended using nested iteration to achieve the aforementioned operations of exponentiation, and tetration. As such these functions can also all be defined with primitive recursive definitions.</p>
+                
+                <p>But of course there are recursive functions that are not primitive recursive the first person to provide a function that illustrates this was Willhelm Ackermann who created a total function that is not primitive recursive known as Ackermann&rsquo;s function. This function is recursively defined as <br>
+                if x = 0 f(x,y) = y+1<br>
                 if x > 0 and y = 0 f(x,y) = f(x-1,1)<br>
                 if x > 0 and n > 0 f(x,y) = f(x-1,f(x,y-1))<br>
-                and the domain is all natural numbers.<br>
-                <br>
-                The last function to be considered that allows us to calculate functions like Ackermann’s function is the minimization function.  This function can also be iterated on or repeatedly composed of itself or other functions. The minimization function can be applied to any dual input function such as Ackermann’s function, and is its output is the smallest value of y in f(x,y) where the function’s output is 0.  According to the Stanford Encyclopedia of Philosophy with the addition of this function even Ackermann’s function, and others like it that are generally recursive but not primitively recursive can be reduced to processes of composition and iteration.  
-                <br>
-                We also know that in each of the cases given to a recursively defined function that all other recursive states must be enumerated, in other words if given an input to a recursive function that does not correspond to a base case, like the constant function we must first calculate all the inputs to each of the intermediary functions the original function is composed of must first be calculated.  Once all of the recursive calls have been enumerated according to the rules of functional composition we can use the base case to start solving the enumerated functions, until we have arrived at the result of the original function composed of all these other functions. 
-                <br><br>
+                and the domain is all natural numbers.</p>
                 
-                Conclusion: 
-                Which leads us into the conclusion this paper presents, which is that a last in first out or LIFO based data structure like a stack can be used to iteratively represent any recursion.  It can do so because the nature of functional composition explained above, and the fact that any recursion can be defined by functional composition. That and the fact the stack is one of the simplest data structures makes it an ideal candidate for using to represent recursion iteratively
-            </p>                
+                <p>The last function to be considered that allows us to calculate functions like Ackermann&rsquo;s function is the minimization function. This function can also be iterated on or repeatedly composed of itself or other functions. The minimization function can be applied to any dual input function such as Ackermann&rsquo;s function, and is its output is the smallest value of y in f(x,y) where the function&rsquo;s output is 0. According to the Stanford Encyclopedia of Philosophy with the addition of this function even Ackermann&rsquo;s function, and others like it that are generally recursive but not primitively recursive can be reduced to processes of composition and iteration.</p>
+                
+                <p>We also know that in each of the cases given to a recursively defined function that all other recursive states must be enumerated, in other words if given an input to a recursive function that does not correspond to a base case, like the constant function we must first calculate all the inputs to each of the intermediary functions the original function is composed of must first be calculated. Once all of the recursive calls have been enumerated according to the rules of functional composition we can use the base case to start solving the enumerated functions, until we have arrived at the result of the original function composed of all these other functions.</p>
+                
+                <p>
+                Conclusion: <br>
+                Which leads us into the conclusion this paper presents, which is that a last in first out or LIFO based data structure like a stack can be used to iteratively represent any recursion. It can do so because the nature of functional composition explained above, and the fact that any recursion can be defined by functional composition. That and the fact the stack is one of the simplest data structures makes it an ideal candidate for using to represent recursion iteratively<br>
+                </p>               
             <div id="include-partials/contact"></div>
             </div>
 
