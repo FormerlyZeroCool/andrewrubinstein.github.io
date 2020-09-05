@@ -311,7 +311,8 @@
 	text-align: center;
 }
 
-.text-container-dark-background {
+.text-container-small {
+	border-radius: 20px;
 	position: relative;
 	margin: auto;
 	margin-left: 5vw;
