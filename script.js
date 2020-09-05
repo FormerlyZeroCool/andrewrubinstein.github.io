@@ -158,4 +158,5 @@ document.addEventListener('DOMContentLoaded',() => {
     includeHTML('partials/contact');
     includeHTML('partials/gtag');
     updateDataInclude();
+    addAnalyticsToHead();
 })
