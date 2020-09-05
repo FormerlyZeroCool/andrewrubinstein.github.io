@@ -146,5 +146,6 @@ async function updateDataInclude(){
 document.addEventListener('DOMContentLoaded',() => {
     includeHTML('partials/navigation');
     includeHTML('partials/contact');
+    includeHTML('partials/gtag');
     updateDataInclude();
 })
