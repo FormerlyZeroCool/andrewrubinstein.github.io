@@ -146,7 +146,7 @@ async function updateDataInclude(){
 async function addAnalyticsToHead()
 {
   const headElement = document.getElementsByTagName('head');
-  if(headContent)
+  if(headElement)
   {
     const headContent = headElement[0].innerHTML;
     const googleAnalyticsTag = await getDataText('/partials/gtag.html')
