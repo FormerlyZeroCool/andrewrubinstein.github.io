@@ -143,9 +143,20 @@ async function updateDataInclude(){
         element.innerHTML = jsListToHtml(data)+'\n'+element.innerHTML;
     }
 }
+async function addAnalyticsToHead()
+{
+  const headElement = document.getElementsByTagName('head');
+  if(headContent)
+  {
+    const headContent = headElement[0].innerHTML;
+    const googleAnalyticsTag = await getDataText('/partials/gtag.html')
+    headElement[0].innerHTML = googleAnalyticsTag + '\n' + headContent;
+  }
+}
 document.addEventListener('DOMContentLoaded',() => {
     includeHTML('partials/navigation');
     includeHTML('partials/contact');
     includeHTML('partials/gtag');
     updateDataInclude();
+    addAnalyticsToHead();
 })
