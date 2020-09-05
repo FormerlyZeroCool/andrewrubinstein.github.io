@@ -20,8 +20,8 @@ for x in arr:
         dataArr.append(p)
 json = ''
 for x in dataArr:
-    json += '{"fileName":"' + x.name + '","title":"' + x.title + '","desc":"' + x.desc + '"},'
-json = json[0:len(json)-1]
+    json += '{"fileName":"' + x.name + '","title":"' + x.title + '","desc":"' + x.desc + '"},\n'
+json = json[0:len(json)-2]
 json = '['+json+']'
 print('Data saved:')
 print(json)
