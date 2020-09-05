@@ -119,7 +119,7 @@ async function includeDynamicHTML(fileName){
     include(fileName,"");
 }
 function jsListToHtml(list){
-    let html = '<ul style="list-style-type:none;>';
+    let html = '<ul style="list-style-type:none;">';
     for(element of list)
     {
       html += `<li class="text-container-small">
