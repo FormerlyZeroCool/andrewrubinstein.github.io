@@ -127,7 +127,7 @@ function jsListToHtml(list){
       <h3>${element.title}</h3> 
       </a>  
       <p>${element.desc}</p>
-      </li>`;
+      </li><br>`;
     }
     html += "</ul>";
     return html
