@@ -8,6 +8,7 @@
 
 #content {
 	border-radius: 10px;
+	min-height: 97%;
 	border: 5px solid rgb(255, 255, 255);
 	margin-left: auto;
 	margin-right: auto;
@@ -19,7 +20,7 @@
 
 #subcontent {
 	max-width: 1400;
-	height: 97%;
+	min-height: 97%;
 	margin-left: auto;
 	margin-right: auto;
 	width: 94vw;
