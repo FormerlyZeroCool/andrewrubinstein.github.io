@@ -12,7 +12,7 @@
 	margin-left: auto;
 	margin-right: auto;
 	width: 97vw;
-	height: 97%;
+	height: auto;
 	min-height: 97vh;
 	text-align: center;
 }
@@ -30,7 +30,6 @@
 
 .sunset-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -40,7 +39,6 @@
 
 .sunsetwater-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: left;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -50,7 +48,6 @@
 
 .city-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -59,7 +56,6 @@
 }
 .nature-clouds-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -69,7 +65,6 @@
 
 .two-trees-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -78,7 +73,6 @@
 }
 .skyline-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -88,7 +82,6 @@
 
 .barge-backdrop {
 	width: 100%;
-	height: 97%;
 	background-position: left;
 	background-repeat: no-repeat;
 	background-size: cover;
