@@ -150,7 +150,7 @@ async function addAnalyticsToHead()
   {
     const headContent = headElement[0].innerHTML;
     const googleAnalyticsTag = await getDataText('/partials/gtag.html')
-    headElement[0].innerHTML = googleAnalyticsTag + '\n' + headContent;
+    headElement[0].innerHTML = headContent + '\n' + googleAnalyticsTag;
   }
 }
 document.addEventListener('DOMContentLoaded',() => {
