@@ -133,7 +133,6 @@ function jsListToHtml(list){
     return html
 }
 async function updateDataInclude(){
-  console.log('hello');
     const path = 'data';
     const element = document.getElementById(`include-${path}`);
     if(element)
