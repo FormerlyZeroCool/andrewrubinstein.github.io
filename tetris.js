@@ -173,18 +173,19 @@ class Field{
     }
     onKeyPress(event)
     {
-        console.log(event.code);
+        console.log(event.keyCode);
         if(event.code === "Space")
         {
             this.clear(this.livePiece);
             while(this.isClearBelow(this.livePiece))
                 this.livePiece.center[1]++;
-                this.place(this.livePiece);
+            this.place(this.livePiece);
             this.livePiece = this.pieceQueue.pop();
             this.pieceQueue.push(this.genRandomNewPiece());
             this.livePiece.center = [this.w/2, 1];
+            this.place(this.livePiece);
         }
-        else if(event.code === "KeyW" && this.livePiece.type != "o")
+        else if((event.code === "KeyW" || event.keyCode === 38) && this.livePiece.type != "o")
         {
             this.clear(this.livePiece);
             const newPiece = this.clonePiece(this.livePiece);
@@ -194,21 +195,21 @@ class Field{
             }
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyA")
+        else if(event.code === "KeyA" || event.keyCode === 37)
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [-1,0]))
                 this.livePiece.center[0]--;
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyD")
+        else if(event.code === "KeyD" || event.keyCode === 39)
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [1,0]))
                 this.livePiece.center[0]++;
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyS")
+        else if(event.code === "KeyS" || event.keyCode === 40)
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [0,1]))
@@ -231,6 +232,11 @@ class Field{
                 this.pieceQueue.push(this.genRandomNewPiece());
             }
             this.holdPiece = old;
+            this.place(this.livePiece);
+        }
+        else if(event.code === "Key")
+        {
+
         }
     }
     clear(piece)
@@ -477,11 +483,14 @@ async function main()
     let f = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
-    document.addEventListener("keypress", (event) => f.onKeyPress(event) ); 
     window.addEventListener('keydown', function(e) {
-        if(e.keyCode == 32 && e.target == document.body) {
+        if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
           f.onKeyPress(e)
+        }
+        else
+        {
+            f.onKeyPress(e);
         }
       });
     //document.getElementById("undo").addEventListener("click", (event) => f.deleteLast())
