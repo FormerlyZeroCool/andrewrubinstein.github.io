@@ -180,7 +180,8 @@ class Field{
             while(this.isClearBelow(this.livePiece))
                 this.livePiece.center[1]++;
                 this.place(this.livePiece);
-            this.livePiece = this.genRandomNewPiece();
+            this.livePiece = this.pieceQueue.pop();
+            this.pieceQueue.push(this.genRandomNewPiece());
         }
         else if(event.code === "KeyW" && this.livePiece.type != "o")
         {
