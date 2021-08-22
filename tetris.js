@@ -41,6 +41,13 @@ class Queue {
         }
         return false;
     }
+    set(index, obj)
+    {
+        if(index < this.length)
+        {
+            this.data[(index+this.start)%this.data.length] = obj;
+        }
+    }
 }
 
 class Field{
@@ -206,6 +213,23 @@ class Field{
                 this.livePiece.center[1]++;
             this.place(this.livePiece);
         }
+        else if(event.code == "KeyE")
+        {
+            this.clear(this.livePiece);
+            const type = this.livePiece.type;
+            let old = this.pieceTypes.find(el => el.type === type);
+            old.center = [this.w/2, 1];
+            if(this.holdPiece)
+            {
+                this.livePiece = this.holdPiece;
+            }
+            else
+            {
+                this.livePiece = this.pieceQueue.pop();
+                this.pieceQueue.push(this.genRandomNewPiece());
+            }
+            this.holdPiece = old;
+        }
     }
     clear(piece)
     {
@@ -350,10 +374,12 @@ class Field{
                     this.ctx.strokeRect(x*width+width/4, y*height+height/4, width/2, height/2);
             }
         }
-        width -= width/4;
-        height -= height/4;
-        const hoffset = 115;
-        for(let i = 0; i < this.pieceQueue.length; i++)
+        width -= width/3;
+        height -= height/3;
+        const hoffset = 155;
+        this.ctx.font = '16px Calibri';
+        this.ctx.fillText('Hold Piece:', 5+this.boundedWidth, 15);
+        for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
         {
             let field = [];
             for(let j = 0; j < 25; j++)
@@ -368,7 +394,7 @@ class Field{
                     const color = field[x + y*5].color;
                     this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
-                    const gy = hoffset+(height*5)*i+(height)*y;
+                    const gy = hoffset+(height*5.2)*i+(height)*y;
                     this.ctx.fillRect(gx, gy, width, height);
                     this.ctx.strokeStyle = "#FFFFFF";
                     this.ctx.strokeRect(gx, gy, width, height);
@@ -376,10 +402,33 @@ class Field{
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
                 }
             }
-            this.ctx.strokeStyle = "#FFFF00";
-            this.ctx.strokeRect(this.boundedWidth+5, hoffset+(height*5)*i, width*5, height*5);
 
         }
+        if(this.holdPiece)
+        {
+            let field = [];
+            for(let j = 0; j < 25; j++)
+                field.push({color:"#000000"});
+            const piece = {type:this.holdPiece.type,center:[2,2], vectors:this.holdPiece.vectors, color:this.holdPiece.color};
+            
+            this.placeAny(piece, field, 5);
+            for(let y = 0; y < 5; y++)
+            {
+                for(let x = 0; x < 5; x++)
+                {
+                    const color = field[x + y*5].color;
+                    this.ctx.fillStyle = color;
+                    const gx = this.boundedWidth+5+(width)*x;
+                    const gy = 30+(height)*y;
+                    this.ctx.fillRect(gx, gy, width, height);
+                    this.ctx.strokeStyle = "#FFFFFF";
+                    this.ctx.strokeRect(gx, gy, width, height);
+                    if(color != "#000000")
+                        this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                }
+            }
+        }
+        
     }
 };
 async function main()
