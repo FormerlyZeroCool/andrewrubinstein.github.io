@@ -182,6 +182,7 @@ class Field{
                 this.place(this.livePiece);
             this.livePiece = this.pieceQueue.pop();
             this.pieceQueue.push(this.genRandomNewPiece());
+            this.livePiece.center = [this.w/2, 1];
         }
         else if(event.code === "KeyW" && this.livePiece.type != "o")
         {
