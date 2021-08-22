@@ -117,8 +117,7 @@ class Field{
             }
 
         ];
-        
-        this.holdPiece;
+        this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
         this.pieceQueue = new Queue(5);
@@ -347,12 +346,17 @@ class Field{
     }
     calcMaxScore(level)
     {
-        return 40 * (level + 1)	+ 100 * (level + 1) + 300 * (level + 1) + 1200 * (level + 1);
+        return 40 * (level+1)	+ 100 * (level) + 300 * level * (level>2) + 1200 * level *(level > 5);
     }
     update()
     {
+        //remove colors of live piece from field for checking collision if piece is moved down
         this.clear(this.livePiece);
+        //check if any rows have been cleared
+        //if they are clear them, and translate rows above down
+        //returns count of rows cleared
         const rowsCleared = this.clearFilled();
+        //scoring sytsem
         if(rowsCleared >= 4)
         {
             this.score += 800 + 400*(this.lastRowsCleared>=4);
@@ -361,43 +365,51 @@ class Field{
         {
             this.score += 100*rowsCleared;
         }
+        //leveling system
         while(this.calcMaxScore(this.level) < this.score && this.level < this.maxLevel)
         {
             this.level++;
         }
+        //check if piece can be moved down one
         if(this.isClearBelow(this.livePiece))
         {
+            //move piece down one 
             this.livePiece.center[1] += 1;
-            this.place(this.livePiece);
         }
-        else
+        else//otherwise place the current piece back on the field then draw new piece from queue
         {
+            //place current piece onto screen
             this.place(this.livePiece);
+            //get next live piece
             this.livePiece = this.pieceQueue.pop();
+            //ensure it is in the correct position
             this.livePiece.center = [this.w/2, 1];
+            //add new piece to queue of next pieces
             this.pieceQueue.push(this.genRandomNewPiece());
+            //check if top row is full
             const topRow = {type:"none", center:[0,0],vectors:[],color:"#000000"};
+            //building vectors to point to top row
             for(let i = 0; i < this.w; i++)
             {
                 topRow.vectors.push([i,0]);
             }
+            //use existing algorithm to check if the top row is filled
             if(!this.isClear(topRow))
             {
+                //reset game
                 this.gameOver();
             }
         }
+        //place current live piece onto the field for drawing
         if(this.livePiece)
             this.place(this.livePiece);
-        
-        this.lastRowsCleared = rowsCleared;
+        //update last row cleared count for scoring
+        if(rowsCleared > 0)
+            this.lastRowsCleared = rowsCleared;
     }
     
     draw()
     {
-        if(!this.holdPiece)
-        {
-            this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
-        }
         let width = this.boundedWidth/this.w;
         let height = this.boundedHeight/this.h;
         for(let y = 0; y < this.h; y++)
