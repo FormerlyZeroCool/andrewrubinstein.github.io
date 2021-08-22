@@ -355,10 +355,11 @@ class Field{
         {
             this.score += 100*rowsCleared;
         }
-        while(this.calcMaxScore(this.level) > this.level)
+        while(this.calcMaxScore(this.level) < this.score)
         {
             this.level++;
         }
+        console.log(this.level);
         if(this.isClearBelow(this.livePiece))
         {
             this.livePiece.center[1] += 1;
