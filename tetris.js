@@ -172,7 +172,7 @@ class Field{
     }
     onKeyPress(event)
     {
-        if(event.code === "Space")
+        if(event.code === "Space")//Hard drop
         {
             this.clear(this.livePiece);
             while(this.isClearBelow(this.livePiece))
@@ -183,7 +183,7 @@ class Field{
             this.livePiece.center = [this.w/2, 1];
             this.place(this.livePiece);
         }
-        else if((event.code === "KeyW" || event.keyCode === 38) && this.livePiece.type != "o")
+        else if((event.code === "KeyW" || event.keyCode === 38) && this.livePiece.type != "o")//rotate
         {
             this.clear(this.livePiece);
             const newPiece = this.clonePiece(this.livePiece);
@@ -193,28 +193,28 @@ class Field{
             }
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyA" || event.keyCode === 37)
+        else if(event.code === "KeyA" || event.keyCode === 37)//move/translate left
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [-1,0]))
                 this.livePiece.center[0]--;
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyD" || event.keyCode === 39)
+        else if(event.code === "KeyD" || event.keyCode === 39)//move/translate right
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [1,0]))
                 this.livePiece.center[0]++;
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyS" || event.keyCode === 40)
+        else if(event.code === "KeyS" || event.keyCode === 40)//move/translate down
         {
             this.clear(this.livePiece);
             if(this.isClearTranslated(this.livePiece, [0,1]))
                 this.livePiece.center[1]++;
             this.place(this.livePiece);
         }
-        else if(event.code == "KeyE")
+        else if(event.code == "KeyE")//Hold piece implementation
         {
             this.clear(this.livePiece);
             const type = this.livePiece.type;
@@ -232,9 +232,9 @@ class Field{
             this.holdPiece = old;
             this.place(this.livePiece);
         }
-        else if(event.code === "Key")
+        else if(event.code === "KeyP")//pause
         {
-
+            this.active = !this.active;
         }
     }
     clear(piece)
@@ -362,6 +362,8 @@ class Field{
     }
     update()
     {
+        if(!this.active)
+            return;
         //remove colors of live piece from field for checking collision if piece is moved down
         this.clear(this.livePiece);
         //check if any rows have been cleared
