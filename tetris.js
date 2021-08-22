@@ -222,7 +222,7 @@ class Field{
             const type = this.livePiece.type;
             let old = this.pieceTypes.find(el => el.type === type);
             old.center = [this.w/2, 1];
-            if(this.holdPiece)
+            if(this.holdPiece && this.holdPiece.type != "null")
             {
                 this.livePiece = this.holdPiece;
             }
@@ -394,6 +394,10 @@ class Field{
     
     draw()
     {
+        if(!this.holdPiece)
+        {
+            this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
+        }
         let width = this.boundedWidth/this.w;
         let height = this.boundedHeight/this.h;
         for(let y = 0; y < this.h; y++)
@@ -442,8 +446,6 @@ class Field{
             }
 
         }
-        if(this.holdPiece)
-        {
             let field = [];
             for(let j = 0; j < 25; j++)
                 field.push({color:"#000000"});
@@ -465,7 +467,7 @@ class Field{
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
                 }
             }
-        }
+        
         
     }
 };
