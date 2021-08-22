@@ -42,15 +42,14 @@ class Queue {
         return false;
     }
 }
+
 class Field{
-    constructor(canvas, ctx, x, y, width, height)
+    constructor(canvas, ctx)
     {
         this.canvas = canvas;
         this.ctx = ctx;
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        this.boundedWidth = canvas.width/8*5;
+        this.boundedHeight = canvas.height;
         this.w = 10;
         this.h = 25;
         this.mousePos = {x:0, y:0};
@@ -161,6 +160,10 @@ class Field{
         this.mousePos.y = event.clientY-rect.top;
         }
     }
+    inBounds(piece)
+    {
+        
+    }
     onKeyPress(event)
     {
         console.log(event.code);
@@ -177,7 +180,7 @@ class Field{
             this.clear(this.livePiece);
             const newPiece = this.clonePiece(this.livePiece);
             this.rotateRight(newPiece);
-            if(this.isClear(newPiece)){
+            if(this.isClearTranslated(newPiece,[0,0])){
                 this.livePiece = newPiece;
             }
             this.place(this.livePiece);
@@ -212,14 +215,6 @@ class Field{
             this.field[point[0] + point[1]*this.w].color = "#000000";
         }
     }
-    place(piece)
-    {
-        for(let i = 0; i < piece.vectors.length; i++)
-        {
-            const point = [piece.vectors[i][0]+piece.center[0], piece.vectors[i][1]+piece.center[1]];
-            this.field[point[0] + point[1]*this.w].color = piece.color;
-        }
-    }
     isClearTranslated(piece, vector)
     {
         const center = [piece.center[0]+vector[0], piece.center[1]+vector[1]];
@@ -239,6 +234,8 @@ class Field{
     }
     gameOver()
     {
+        for(let i = 0; i < this.pieceQueue.length; i++)
+            this.pieceQueue[i] = this.genRandomNewPiece();
         for(let i = 0; i < this.field.length; i++)
             this.field[i].color = "#000000";
     }
@@ -299,6 +296,20 @@ class Field{
         }
         this.placeField(activated);
     }
+    placeAny(piece, field, w)
+    {
+        for(let i = 0; i < piece.vectors.length; i++)
+        {
+            const point = [piece.vectors[i][0]+piece.center[0], piece.vectors[i][1]+piece.center[1]];
+            //console.log(point[0] + point[1]*this.w);
+            if(point[0] + point[1]*w < field.length)
+                field[point[0] + point[1]*w].color = piece.color;
+        }
+    }
+    place(piece)
+    {
+        this.placeAny(piece, this.field, this.w);
+    }
     update()
     {
         this.clear(this.livePiece);
@@ -324,8 +335,8 @@ class Field{
     
     draw()
     {
-        const width = this.width/this.w;
-        const height = this.height/this.h;
+        let width = this.boundedWidth/this.w;
+        let height = this.boundedHeight/this.h;
         for(let y = 0; y < this.h; y++)
         {
             for(let x = 0; x < this.w; x++)
@@ -338,6 +349,36 @@ class Field{
                 if(color != "#000000")
                     this.ctx.strokeRect(x*width+width/4, y*height+height/4, width/2, height/2);
             }
+        }
+        width -= width/4;
+        height -= height/4;
+        const hoffset = 115;
+        for(let i = 0; i < this.pieceQueue.length; i++)
+        {
+            let field = [];
+            for(let j = 0; j < 25; j++)
+                field.push({color:"#000000"});
+            const piece = {type:this.pieceQueue.get(i).type,center:[2,2], vectors:this.pieceQueue.get(i).vectors, color:this.pieceQueue.get(i).color};
+            
+            this.placeAny(piece, field, 5);
+            for(let y = 0; y < 5; y++)
+            {
+                for(let x = 0; x < 5; x++)
+                {
+                    const color = field[x + y*5].color;
+                    this.ctx.fillStyle = color;
+                    const gx = this.boundedWidth+5+(width)*x;
+                    const gy = hoffset+(height*5)*i+(height)*y;
+                    this.ctx.fillRect(gx, gy, width, height);
+                    this.ctx.strokeStyle = "#FFFFFF";
+                    this.ctx.strokeRect(gx, gy, width, height);
+                    if(color != "#000000")
+                        this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                }
+            }
+            this.ctx.strokeStyle = "#FFFF00";
+            this.ctx.strokeRect(this.boundedWidth+5, hoffset+(height*5)*i, width*5, height*5);
+
         }
     }
 };
