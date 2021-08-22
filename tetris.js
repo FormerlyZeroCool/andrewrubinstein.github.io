@@ -172,7 +172,6 @@ class Field{
     }
     onKeyPress(event)
     {
-        console.log(event.keyCode);
         if(event.code === "Space")
         {
             this.clear(this.livePiece);
@@ -265,10 +264,13 @@ class Field{
     }
     gameOver()
     {
+        //reset level, and score
         this.level = 0;
         this.score = 0;
+        //reset piece queue
         for(let i = 0; i < this.pieceQueue.length; i++)
             this.pieceQueue[i] = this.genRandomNewPiece();
+        //reset field for drawing
         for(let i = 0; i < this.field.length; i++)
             this.field[i].color = "#000000";
     }
@@ -278,7 +280,7 @@ class Field{
         for(let y = 0; y < this.h; y++)
         {
             let full = true;
-            for(let x = 0;full && x < this.w; x++)
+            for(let x = 0; full && x < this.w; x++)
             {
                 full = this.field[x + y*this.w].color != "#000000";
             }
@@ -290,8 +292,10 @@ class Field{
     placeField(data)
     {
         data.vectors.forEach(el => {
+            //calc x and y for point represented as point and vector
             const x = data.center[0]+el[0];
             const y = data.center[1]+el[1];
+            //update color according to saved color 
             this.field[x + y*this.w].color = el[2];
         });
     }
