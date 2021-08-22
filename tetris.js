@@ -297,8 +297,11 @@ class Field{
     }
     clearFilled()
     {
+        //get list of the indexes of rows to be cleared
         const filled = this.getFilledRows();
+        //load the field as vectors relative to a point with color as an attribute per rect
         const topOfField = [];
+        //reserve known amount of memory for array to avoid copying
         topOfField.length = this.w*this.h;
         for(let y = 0; y  < this.h; y++)
         {
@@ -308,16 +311,18 @@ class Field{
                 }
 
         }
+        //create "piece" that represents the field as vectors relative to a point
         const activated = {type:"field",center:[0,0], vectors:topOfField};
         for(let y = 0; y < this.h; y++)
         {
             for(let x = 0; x < this.w; x++)
                 this.field[x + y*this.w].color = "#000000";
         }
+        //remove one row per iteration of loop
         for(let i = 0; i < filled.length; i ++)
         {
             const rowNum = filled[i];
-            //remove vectors with y value matching filled row index
+            //remove vectors with y value matching filled row index to remove row at index i
             activated.vectors = activated.vectors.filter( function(item, idx) {
                 return item[1] != rowNum;
             });
@@ -327,26 +332,29 @@ class Field{
                     activated.vectors[i][1]++;
             };
         }
+        //put field as vectors back into field represented as list of colors
         this.placeField(activated);
+        //return count of rows removed
         return filled.length;
     }
+    //places a piece on any field for drawing
     placeAny(piece, field, w)
     {
         for(let i = 0; i < piece.vectors.length; i++)
         {
             const point = [piece.vectors[i][0]+piece.center[0], piece.vectors[i][1]+piece.center[1]];
-            //console.log(point[0] + point[1]*this.w);
             if(point[0] + point[1]*w < field.length)
                 field[point[0] + point[1]*w].color = piece.color;
         }
     }
+    //places a piece on the member variable field for drawing
     place(piece)
     {
         this.placeAny(piece, this.field, this.w);
     }
     calcMaxScore(level)
     {
-        return 40 * (level+1)	+ 100 * (level) + 300 * level * (level>2) + 1200 * level *(level > 5);
+        return 40 * (level+1) + 100 * (level) + 300 * level * (level>2) + 1200 * level * (level > 5);
     }
     update()
     {
