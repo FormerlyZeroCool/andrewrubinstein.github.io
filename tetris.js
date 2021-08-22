@@ -51,7 +51,7 @@ class Queue {
 }
 
 class Field{
-    constructor(canvas, ctx)
+    constructor(canvas, ctx, maxLevel)
     {
         this.canvas = canvas;
         this.ctx = ctx;
@@ -61,6 +61,10 @@ class Field{
         this.h = 25;
         this.mousePos = {x:0, y:0};
         this.active = true;
+        this.score = 0;
+        this.level = 0;
+        this.maxLevel = maxLevel+1;
+        this.lastRowsCleared = 0;
         this.pieceTypes = [
             //T
             {
@@ -167,10 +171,6 @@ class Field{
         this.mousePos.y = event.clientY-rect.top;
         }
     }
-    inBounds(piece)
-    {
-        
-    }
     onKeyPress(event)
     {
         console.log(event.code);
@@ -260,6 +260,8 @@ class Field{
     }
     gameOver()
     {
+        this.level = 0;
+        this.score = 0;
         for(let i = 0; i < this.pieceQueue.length; i++)
             this.pieceQueue[i] = this.genRandomNewPiece();
         for(let i = 0; i < this.field.length; i++)
@@ -321,6 +323,7 @@ class Field{
             };
         }
         this.placeField(activated);
+        return filled.length;
     }
     placeAny(piece, field, w)
     {
@@ -336,10 +339,26 @@ class Field{
     {
         this.placeAny(piece, this.field, this.w);
     }
+    calcMaxScore(level)
+    {
+        return 40 * (level + 1)	+ 100 * (level + 1) + 300 * (level + 1) + 1200 * (level + 1);
+    }
     update()
     {
         this.clear(this.livePiece);
-        this.clearFilled();
+        const rowsCleared = this.clearFilled();
+        if(rowsCleared >= 4)
+        {
+            this.score += 800 + 400*(this.lastRowsCleared>=4);
+        }
+        else
+        {
+            this.score += 100*rowsCleared;
+        }
+        while(this.calcMaxScore(this.level) > this.level)
+        {
+            this.level++;
+        }
         if(this.isClearBelow(this.livePiece))
         {
             this.livePiece.center[1] += 1;
@@ -363,6 +382,8 @@ class Field{
         }
         if(this.livePiece)
             this.place(this.livePiece);
+        
+        this.lastRowsCleared = rowsCleared;
     }
     
     draw()
@@ -388,6 +409,8 @@ class Field{
         this.ctx.font = '16px Calibri';
         this.ctx.fillStyle = "#000000";
         this.ctx.fillText('Hold Piece:', 5+this.boundedWidth, 15);
+        this.ctx.fillText('Score: '+this.score, 5+this.boundedWidth, 15+height*6.8);
+        this.ctx.fillText('Level: '+this.level, 5+this.boundedWidth, 15+height*6.8+20);
         for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
         {
             let field = [];
@@ -450,7 +473,7 @@ async function main()
     let x = 0
     //let f = Field(lines, canvas.width, gridDim, ctx)
     dim = canvas.width;
-    let f = new Field(canvas, ctx, 0, 0, 250, 550);
+    let f = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
     document.addEventListener("keypress", (event) => f.onKeyPress(event) );
@@ -462,7 +485,7 @@ async function main()
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0,0,canvas.width,canvas.height)
         ctx.fillStyle = "#FF0000";
-        if(count % 5 == 0)
+        if(count % (f.maxLevel - f.level) == 0)
             f.update()
         f.draw()
     }
