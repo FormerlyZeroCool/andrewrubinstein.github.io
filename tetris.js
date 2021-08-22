@@ -359,7 +359,6 @@ class Field{
         {
             this.level++;
         }
-        console.log(this.level);
         if(this.isClearBelow(this.livePiece))
         {
             this.livePiece.center[1] += 1;
