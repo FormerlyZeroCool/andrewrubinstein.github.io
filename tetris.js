@@ -465,6 +465,7 @@ class Field{
 };
 async function main()
 {
+   
     const canvas = document.getElementById("screen");
     const ctx = canvas.getContext("2d");
     const gridDim = 4
@@ -476,7 +477,13 @@ async function main()
     let f = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
-    document.addEventListener("keypress", (event) => f.onKeyPress(event) );
+    document.addEventListener("keypress", (event) => f.onKeyPress(event) ); 
+    window.addEventListener('keydown', function(e) {
+        if(e.keyCode == 32 && e.target == document.body) {
+          e.preventDefault();
+          f.onKeyPress(e)
+        }
+      });
     //document.getElementById("undo").addEventListener("click", (event) => f.deleteLast())
     let count = 0;
     while(true){
