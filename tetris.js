@@ -347,8 +347,14 @@ class Field{
         {
             this.place(this.livePiece);
             this.livePiece = this.pieceQueue.pop();
+            this.livePiece.center = [this.w/2, 1];
             this.pieceQueue.push(this.genRandomNewPiece());
-            if(!this.isClear(this.livePiece))
+            const topRow = {type:"none", center:[0,0],vectors:[],color:"#000000"};
+            for(let i = 0; i < this.w; i++)
+            {
+                topRow.vectors.push([i,0]);
+            }
+            if(!this.isClear(topRow))
             {
                 this.gameOver();
             }
@@ -378,6 +384,7 @@ class Field{
         height -= height/3;
         const hoffset = 155;
         this.ctx.font = '16px Calibri';
+        this.ctx.fillStyle = "#000000";
         this.ctx.fillText('Hold Piece:', 5+this.boundedWidth, 15);
         for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
         {
