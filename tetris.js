@@ -355,7 +355,7 @@ class Field{
         {
             this.score += 100*rowsCleared;
         }
-        while(this.calcMaxScore(this.level) < this.score)
+        while(this.calcMaxScore(this.level) < this.score && this.level < this.maxLevel)
         {
             this.level++;
         }
