@@ -633,7 +633,7 @@ class Field{
                 }
                 else if(this.active)
                 {
-                    if(Date.now() - this.lastTouchStart[1] > 350)
+                    if(Date.now() - this.lastTouchStart[1] > 300)
                     {
                         this.rotate();
                     }
