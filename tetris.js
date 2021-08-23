@@ -532,19 +532,6 @@ class Field{
         
         
     }
-    onTouchStart(event)
-    {
-        /*const data = {type:"start",e:[]}
-        for(let a in event.changedTouches.item(0))
-        {
-            data.e.push([a,event.changedTouches.item(0)[a]])
-        }
-        this.logToServer(data);*/
-        this.lastTouchStart = [this.touchStart, this.lastTouchTime];
-        this.lastTouchTime = Date.now();
-        this.touchStart = event.changedTouches.item(0);
-        event.preventDefault();
-    }
     mag(a)
     {
         let sum = 0;
@@ -574,6 +561,52 @@ class Field{
         }
         return sum;
     }
+    onTouchStart(event)
+    {
+        const data = {type:"start",e:[]}
+        for(let a in event.touches.item(0))
+        {
+            data.e.push([a,event.touches.item(0)[a]])
+        }
+        this.logToServer(data);
+        this.lastTouchStart = [this.touchStart, this.lastTouchTime];
+        this.lastTouchTime = Date.now();
+        this.touchStart = event.changedTouches.item(0);
+        this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
+        event.preventDefault();
+    }
+    onTouchMove(event)
+    {   
+        let touchMove = event.changedTouches.item(0);
+        for(let i = 0; i < event.changedTouches["length"]; i++)
+        {
+            if(event.changedTouches.item(i).identifier == this.touchStart.identifier){
+                touchMove = event.changedTouches.item(i);
+            }
+        } 
+        if(touchMove)
+        {
+            const deltaY = touchMove["clientY"]-this.mousePos[1];
+            const deltaX = touchMove["clientX"]-this.mousePos[0];
+            this.mousePos[1] += deltaY;
+            this.mousePos[0] += deltaX;
+            const newGridX = Math.floor(((this.mousePos[0] > this.boundedWidth?this.boundedWidth:this.mousePos[0])/this.boundedWidth)*this.w+0.5);
+            this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
+            let count = this.w;
+            while(this.livePiece.center[0] != newGridX && count > 0)
+            {
+                count--;
+                if(this.livePiece.center[0] < newGridX)
+                {
+                    this.moveRight();
+                }
+                else
+                {
+                    this.moveLeft();
+                }
+            }
+        }
+    }
     onTouchEnd(event)
     {
         //let a = vector between start, and end
@@ -594,7 +627,7 @@ class Field{
             //this.logToServer({anglew:angle, mag:mag});
             if(mag > 25)//swipe identified
             {   
-                if(angle < 0 && this.active)//swipe downwards
+                if(angle < 0)//swipe downwards
                 {
                     if(Math.abs(angle) > 135)//swipe left
                     {
@@ -631,9 +664,9 @@ class Field{
                 {
                     this.active = !this.active;
                 }
-                else if(this.active)
+                else
                 {
-                    if(Date.now() - this.lastTouchStart[1] > 330)
+                    if(Date.now() - this.lastTouchStart[1] > 350)
                     {
                         this.rotate();
                     }
@@ -673,6 +706,7 @@ async function main()
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
     canvas.addEventListener('touchstart', event => f.onTouchStart(event), false);
+    canvas.addEventListener('touchmove', event => f.onTouchMove(event), false);
     canvas.addEventListener('touchend', event => f.onTouchEnd(event), false);
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
