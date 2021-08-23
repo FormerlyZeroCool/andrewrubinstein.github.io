@@ -449,7 +449,8 @@ class Field{
         this.ctx.fillStyle = "#000000";
         this.ctx.fillText('Hold Piece:', 5+this.boundedWidth, 15);
         this.ctx.fillText('Score: '+this.score, 5+this.boundedWidth, 15+height*6.8);
-        this.ctx.fillText('Level: '+this.level, 5+this.boundedWidth, 15+height*6.8+20);
+        const levelText = this.level === (this.maxLevel-1)?"Max":this.level;
+        this.ctx.fillText('Level: '+levelText, 5+this.boundedWidth, 15+height*6.8+20);
         for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
         {
             let field = [];
@@ -499,15 +500,15 @@ class Field{
         
         
     }
+    onTouchStart(event)
+    {
+
+    }
+    onTouchEnd(event)
+    {
+
+    }
 };
-function process_touchstart(event)
-{
-    console.log(event);
-}
-function process_touchend(event)
-{
-    console.log(event)
-}
 async function main()
 {
    
@@ -522,8 +523,8 @@ async function main()
     let f = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
-    canvas.addEventListener('touchstart', process_touchstart, false);
-    canvas.addEventListener('touchend', process_touchend, false);
+    canvas.addEventListener('touchstart', event => f.onTouchStart(event), false);
+    canvas.addEventListener('touchend', event => f.onTouchEnd(event), false);
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
