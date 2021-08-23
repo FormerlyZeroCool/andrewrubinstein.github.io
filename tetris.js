@@ -582,69 +582,71 @@ class Field{
         //because mag of both will be one no need to divide by mag(a)*mag(b)
         //to get the angle, if mag is greater than some number to be defined after testing
         //then use angle to calc direction and determine what event handler to fire
-        const touchEnd = event.changedTouches.item(0);
-        const deltaY = touchEnd["clientY"]-this.touchStart["clientY"];
-        const deltaX = touchEnd["clientX"]-this.touchStart["clientX"];
-        const mag = this.mag([deltaX, deltaY]);
-        const a = this.normalize([deltaX, deltaY]);
-        const b = [1,0];
-        const dotProduct = this.dotProduct(a, b);
-        const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-        if(dotProduct){
-            //this.logToServer({anglew:angle, mag:mag});
-            if(mag > 25)//swipe identified
-            {   
-                if(angle < 0)//swipe downwards
-                {
-                    if(Math.abs(angle) > 135)//swipe left
+        if(this.active)
+        {
+            const touchEnd = event.changedTouches.item(0);
+            const deltaY = touchEnd["clientY"]-this.touchStart["clientY"];
+            const deltaX = touchEnd["clientX"]-this.touchStart["clientX"];
+            const mag = this.mag([deltaX, deltaY]);
+            const a = this.normalize([deltaX, deltaY]);
+            const b = [1,0];
+            const dotProduct = this.dotProduct(a, b);
+            const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+            if(dotProduct){
+                //this.logToServer({anglew:angle, mag:mag});
+                if(mag > 25)//swipe identified
+                {   
+                    if(angle < 0)//swipe downwards
                     {
-                        this.moveLeft();
+                        if(Math.abs(angle) > 135)//swipe left
+                        {
+                            this.moveLeft();
+                        }
+                        else if(Math.abs(angle) < 45)//swipe right
+                        {
+                            this.moveRight();
+                        }
+                        else
+                        {
+                            this.hardDrop();
+                        }
                     }
-                    else if(Math.abs(angle) < 45)//swipe right
+                    else//swipe upwards
                     {
-                        this.moveRight();
+                        if(Math.abs(angle) > 135)//swipe left
+                        {
+                            this.moveLeft();
+                        }
+                        else if(Math.abs(angle) < 45)//swipe right
+                        {
+                            this.moveRight();
+                        }
+                        else
+                        {
+                            this.rotate()
+                        }
+                    }
+                }
+                else//tap registered
+                {
+                    if(this.touchStart["clientX"] > this.boundedWidth)
+                    {
+                        this.active = !this.active;
                     }
                     else
                     {
-                        this.hardDrop();
-                    }
-                }
-                else//swipe upwards
-                {
-                    if(Math.abs(angle) > 135)//swipe left
-                    {
-                        this.moveLeft();
-                    }
-                    else if(Math.abs(angle) < 45)//swipe right
-                    {
-                        this.moveRight();
-                    }
-                    else
-                    {
-                        this.rotate()
-                    }
-                }
-            }
-            else//tap registered
-            {
-                if(this.touchStart["clientX"] > this.boundedWidth)
-                {
-                    this.active = !this.active;
-                }
-                else
-                {
-                    if(Date.now() - this.lastTouchStart[1] > 350)
-                    {
-                        this.rotate();
-                    }
-                    else
-                    {
-                        this.holdLive();
+                        if(Date.now() - this.lastTouchStart[1] > 350)
+                        {
+                            this.rotate();
+                        }
+                        else
+                        {
+                            this.holdLive();
+                        }
                     }
                 }
             }
         }
-        
     }
     logToServer(data)
     {
