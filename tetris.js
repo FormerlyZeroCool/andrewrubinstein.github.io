@@ -593,6 +593,7 @@ class Field{
             const newGridX = Math.floor(((this.mousePos[0] > this.boundedWidth?this.boundedWidth:this.mousePos[0])/this.boundedWidth)*this.w+0.5);
             this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
             let count = this.w;
+            if(this.active)
             while(this.livePiece.center[0] != newGridX && count > 0)
             {
                 count--;
