@@ -231,7 +231,7 @@ class Field{
         this.livePiece.center = [this.w/2, 1];
         this.place(this.livePiece);
     }
-    movedown()
+    moveDown()
     {
         this.clear(this.livePiece);
         if(this.isClearTranslated(this.livePiece, [0,1]))
