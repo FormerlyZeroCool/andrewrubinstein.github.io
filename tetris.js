@@ -268,6 +268,8 @@ class Field{
         //reset level, and score
         this.level = 0;
         this.score = 0;
+        //set hold piece to empty for new game
+        this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         //reset piece queue
         for(let i = 0; i < this.pieceQueue.length; i++)
             this.pieceQueue[i] = this.genRandomNewPiece();
