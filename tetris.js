@@ -534,12 +534,12 @@ class Field{
     }
     onTouchStart(event)
     {
-        const data = {type:"start",e:[]}
-        for(let a in event.changedTouches)
+        /*const data = {type:"start",e:[]}
+        for(let a in event.changedTouches.item(0))
         {
             data.e.push([a,event.changedTouches.item(0)[a]])
         }
-        this.logToServer(data);
+        this.logToServer(data);*/
         this.lastTouchStart = [this.touchStart, this.lastTouchTime];
         this.lastTouchTime = Date.now();
         this.touchStart = event.changedTouches.item(0);
@@ -591,7 +591,7 @@ class Field{
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
         if(dotProduct){
-            this.logToServer({anglew:angle, mag:mag});
+            //this.logToServer({anglew:angle, mag:mag});
             if(mag > 25)//swipe identified
             {   
                 if(angle < 0)//swipe downwards
@@ -627,14 +627,20 @@ class Field{
             }
             else//tap registered
             {
-                this.logToServer({time:Date.now() - this.lastTouchStart[1]})
-                if(Date.now() - this.lastTouchStart[1] > 350)
+                if(this.touchStart["clientX"] > this.boundedWidth)
                 {
-                    this.rotate();
+                    this.active = !this.active;
                 }
                 else
                 {
-                    this.holdLive();
+                    if(Date.now() - this.lastTouchStart[1] > 350)
+                    {
+                        this.rotate();
+                    }
+                    else
+                    {
+                        this.holdLive();
+                    }
                 }
             }
         }
