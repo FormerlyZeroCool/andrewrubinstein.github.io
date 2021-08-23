@@ -1,3 +1,5 @@
+
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -117,6 +119,9 @@ class Field{
             }
 
         ];
+        this.touchStart;
+        this.lastTouchTime = Date.now();
+        this.lastTouchStart;
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
@@ -170,21 +175,23 @@ class Field{
         this.mousePos.y = event.clientY-rect.top;
         }
     }
-    onKeyPress(event)
+    moveRight()
     {
-        if(this.active)
-        if(event.code === "Space")//Hard drop
-        {
-            this.clear(this.livePiece);
-            while(this.isClearBelow(this.livePiece))
-                this.livePiece.center[1]++;
-            this.place(this.livePiece);
-            this.livePiece = this.pieceQueue.pop();
-            this.pieceQueue.push(this.genRandomNewPiece());
-            this.livePiece.center = [this.w/2, 1];
-            this.place(this.livePiece);
-        }
-        else if((event.code === "KeyW" || event.keyCode === 38) && this.livePiece.type != "o")//rotate
+        this.clear(this.livePiece);
+        if(this.isClearTranslated(this.livePiece, [1,0]))
+            this.livePiece.center[0]++;
+        this.place(this.livePiece);
+    }
+    moveLeft()
+    {
+        this.clear(this.livePiece);
+        if(this.isClearTranslated(this.livePiece, [-1,0]))
+            this.livePiece.center[0]--;
+        this.place(this.livePiece);
+    }
+    rotate()
+    {
+        if(this.livePiece.type != "o")
         {
             this.clear(this.livePiece);
             const newPiece = this.clonePiece(this.livePiece);
@@ -194,30 +201,10 @@ class Field{
             }
             this.place(this.livePiece);
         }
-        else if(event.code === "KeyA" || event.keyCode === 37)//move/translate left
-        {
-            this.clear(this.livePiece);
-            if(this.isClearTranslated(this.livePiece, [-1,0]))
-                this.livePiece.center[0]--;
-            this.place(this.livePiece);
-        }
-        else if(event.code === "KeyD" || event.keyCode === 39)//move/translate right
-        {
-            this.clear(this.livePiece);
-            if(this.isClearTranslated(this.livePiece, [1,0]))
-                this.livePiece.center[0]++;
-            this.place(this.livePiece);
-        }
-        else if(event.code === "KeyS" || event.keyCode === 40)//move/translate down
-        {
-            this.clear(this.livePiece);
-            if(this.isClearTranslated(this.livePiece, [0,1]))
-                this.livePiece.center[1]++;
-            this.place(this.livePiece);
-        }
-        else if(event.code == "KeyE")//Hold piece implementation
-        {
-            this.clear(this.livePiece);
+    }
+    holdLive()
+    {
+        this.clear(this.livePiece);
             const type = this.livePiece.type;
             let old = this.pieceTypes.find(el => el.type === type);
             old.center = [this.w/2, 1];
@@ -232,6 +219,51 @@ class Field{
             }
             this.holdPiece = old;
             this.place(this.livePiece);
+    }
+    hardDrop()
+    {
+        this.clear(this.livePiece);
+        while(this.isClearBelow(this.livePiece))
+            this.livePiece.center[1]++;
+        this.place(this.livePiece);
+        this.livePiece = this.pieceQueue.pop();
+        this.pieceQueue.push(this.genRandomNewPiece());
+        this.livePiece.center = [this.w/2, 1];
+        this.place(this.livePiece);
+    }
+    movedown()
+    {
+        this.clear(this.livePiece);
+        if(this.isClearTranslated(this.livePiece, [0,1]))
+            this.livePiece.center[1]++;
+        this.place(this.livePiece);
+    }
+    onKeyPress(event)
+    {
+        if(this.active)
+        if(event.code === "Space")//Hard drop
+        {
+            this.hardDrop();
+        }
+        else if((event.code === "KeyW" || event.keyCode === 38))//rotate
+        {
+            this.rotate();
+        }
+        else if(event.code === "KeyA" || event.keyCode === 37)//move/translate left
+        {
+            this.moveLeft();
+        }
+        else if(event.code === "KeyD" || event.keyCode === 39)//move/translate right
+        {
+            this.moveRight();
+        }
+        else if(event.code === "KeyS" || event.keyCode === 40)//move/translate down
+        {
+            this.moveDown();
+        }
+        else if(event.code == "KeyE")//Hold piece implementation
+        {
+            this.holdLive();
         }
         if(event.code === "KeyP")//pause/unpause
         {
@@ -502,11 +534,122 @@ class Field{
     }
     onTouchStart(event)
     {
-
+        const data = {type:"start",e:[]}
+        for(let a in event.changedTouches)
+        {
+            data.e.push([a,event.changedTouches.item(0)[a]])
+        }
+        this.logToServer(data);
+        this.lastTouchStart = [this.touchStart, this.lastTouchTime];
+        this.lastTouchTime = Date.now();
+        this.touchStart = event.changedTouches.item(0);
+        event.preventDefault();
+    }
+    mag(a)
+    {
+        let sum = 0;
+        for(let i = 0; i < a.length; i++)
+        {
+            sum += a[i]*a[i];
+        }
+        return Math.sqrt(sum);
+    }
+    normalize(a)
+    {
+        const magA = this.mag(a);
+        for(let i = 0; i < a.length; i++)
+        {
+            a[i] /= magA;
+        }
+        return a;
+    }
+    dotProduct(a, b)
+    {
+        if(a.length != b.length)
+            return false;
+        let sum = 0;
+        for(let i = 0; i < a.length; i++)
+        {
+            sum += a[i]*b[i];
+        }
+        return sum;
     }
     onTouchEnd(event)
     {
-
+        //let a = vector between start, and end
+        //let b = normal vector for x [1,0]
+        //normalize vect a by dividing both components by mag(a) and then take the dot product of that normalized vector a an b, then take the inverse cos
+        //because mag of both will be one no need to divide by mag(a)*mag(b)
+        //to get the angle, if mag is greater than some number to be defined after testing
+        //then use angle to calc direction and determine what event handler to fire
+        const touchEnd = event.changedTouches.item(0);
+        const deltaY = touchEnd["clientY"]-this.touchStart["clientY"];
+        const deltaX = touchEnd["clientX"]-this.touchStart["clientX"];
+        const mag = this.mag([deltaX, deltaY]);
+        const a = this.normalize([deltaX, deltaY]);
+        const b = [1,0];
+        const dotProduct = this.dotProduct(a, b);
+        const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+        if(dotProduct){
+            this.logToServer({anglew:angle, mag:mag});
+            if(mag > 25)//swipe identified
+            {   
+                if(angle < 0)//swipe downwards
+                {
+                    if(Math.abs(angle) > 135)//swipe left
+                    {
+                        this.moveLeft();
+                    }
+                    else if(Math.abs(angle) < 45)//swipe right
+                    {
+                        this.moveRight();
+                    }
+                    else
+                    {
+                        this.hardDrop();
+                    }
+                }
+                else//swipe upwards
+                {
+                    if(Math.abs(angle) > 135)//swipe left
+                    {
+                        this.moveLeft();
+                    }
+                    else if(Math.abs(angle) < 45)//swipe right
+                    {
+                        this.moveRight();
+                    }
+                    else
+                    {
+                        this.rotate()
+                    }
+                }
+            }
+            else//tap registered
+            {
+                this.logToServer({time:Date.now() - this.lastTouchStart[1]})
+                if(Date.now() - this.lastTouchStart[1] > 350)
+                {
+                    this.rotate();
+                }
+                else
+                {
+                    this.holdLive();
+                }
+            }
+        }
+        
+    }
+    logToServer(data)
+    {
+        fetch("/data", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+          }).then(res => {console.log("Request complete! response:", data);});
+    
     }
 };
 async function main()
