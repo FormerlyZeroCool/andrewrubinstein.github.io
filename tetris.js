@@ -500,6 +500,14 @@ class Field{
         
     }
 };
+function process_touchstart(event)
+{
+    console.log(event);
+}
+function process_touchend(event)
+{
+    console.log(event)
+}
 async function main()
 {
    
@@ -514,6 +522,8 @@ async function main()
     let f = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => f.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
+    canvas.addEventListener('touchstart', process_touchstart, false);
+    canvas.addEventListener('touchend', process_touchend, false);
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
