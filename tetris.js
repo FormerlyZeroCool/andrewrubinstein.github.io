@@ -592,10 +592,18 @@ class Field{
             const deltaX = touchMove["clientX"]-this.mousePos[0];
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
+
+        const mag = this.mag([deltaX, deltaY]);
+        const a = this.normalize([deltaX, deltaY]);
+        const b = [1,0];
+        const dotProduct = this.dotProduct(a, b);
+        const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+        if(mag > 0.3 && (Math.abs(angle) >= 135 || Math.abs(angle) <= 45))
+        {
             this.piecePosAtTouchStart[0] += deltaX;
             this.piecePosAtTouchStart[1] += deltaY;
-            const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w+0.5);
-            //this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
+            const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
+            //this.logToServer({x:newGridX,mag:mag,angle:angle});
             let count = this.w;
             if(this.active)
             while(this.livePiece.center[0] != newGridX && count > 0)
@@ -610,6 +618,9 @@ class Field{
                     this.moveLeft();
                 }
             }
+
+        }
+        
         }
     }
     onTouchEnd(event)
@@ -643,7 +654,7 @@ class Field{
                 {
                     if(angle >= 45 && angle <= 135)
                     {
-                        this.rotate()
+                        this.holdLive();
                     }
                 }
             }
@@ -655,14 +666,7 @@ class Field{
                 }
                 else
                 {
-                    if(Date.now() - this.lastTouchStart[1] > 350)
-                    {
-                        this.rotate();
-                    }
-                    else
-                    {
-                        this.holdLive();
-                    }
+                    this.rotate();
                 }
             }
         }
