@@ -122,6 +122,7 @@ class Field{
         this.touchStart;
         this.lastTouchTime = Date.now();
         this.lastTouchStart;
+        this.piecePosAtTouchStart = [0,0];
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
@@ -573,6 +574,7 @@ class Field{
         this.lastTouchTime = Date.now();
         this.touchStart = event.changedTouches.item(0);
         this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
+        this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
         event.preventDefault();
     }
     onTouchMove(event)
@@ -590,7 +592,10 @@ class Field{
             const deltaX = touchMove["clientX"]-this.mousePos[0];
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
-            const newGridX = Math.floor(((this.mousePos[0] > this.boundedWidth?this.boundedWidth:this.mousePos[0])/this.boundedWidth)*this.w+0.5);
+            this.piecePosAtTouchStart[0] += deltaY;
+            this.piecePosAtTouchStart[1] += deltaX;
+            //diff between init touch and initial piece pos must be added to every delta
+            const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w+0.5);
             this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
             let count = this.w;
             if(this.active)
