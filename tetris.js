@@ -598,7 +598,7 @@ class Field{
         const b = [1,0];
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-        if(mag > 0.6 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
+        if(mag > 0.5 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
         {
             this.piecePosAtTouchStart[0] += deltaX;
             this.piecePosAtTouchStart[1] += deltaY;
