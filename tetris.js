@@ -592,6 +592,8 @@ class Field{
             const deltaX = touchMove["clientX"]-this.mousePos[0];
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
+
+        const mag = this.mag([deltaX, deltaY]);
         const a = this.normalize([deltaX, deltaY]);
         const b = [1,0];
         const dotProduct = this.dotProduct(a, b);
