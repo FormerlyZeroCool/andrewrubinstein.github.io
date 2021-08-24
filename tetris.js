@@ -634,30 +634,14 @@ class Field{
             {   
                 if(angle < 0)//swipe downwards
                 {
-                    if(Math.abs(angle) > 135)//swipe left
-                    {
-                        this.moveLeft();
-                    }
-                    else if(Math.abs(angle) < 45)//swipe right
-                    {
-                        this.moveRight();
-                    }
-                    else
+                    if(Math.abs(angle) >= 45 && Math.abs(angle) <= 135)
                     {
                         this.hardDrop();
                     }
                 }
                 else//swipe upwards
                 {
-                    if(Math.abs(angle) > 135)//swipe left
-                    {
-                        this.moveLeft();
-                    }
-                    else if(Math.abs(angle) < 45)//swipe right
-                    {
-                        this.moveRight();
-                    }
-                    else
+                    if(angle >= 45 && angle <= 135)
                     {
                         this.rotate()
                     }
