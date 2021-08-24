@@ -564,12 +564,12 @@ class Field{
     }
     onTouchStart(event)
     {
-        const data = {type:"start",e:[]}
+        /*const data = {type:"start",e:[]}
         for(let a in event.touches.item(0))
         {
             data.e.push([a,event.touches.item(0)[a]])
         }
-        this.logToServer(data);
+        this.logToServer(data);*/
         this.lastTouchStart = [this.touchStart, this.lastTouchTime];
         this.lastTouchTime = Date.now();
         this.touchStart = event.changedTouches.item(0);
@@ -592,11 +592,10 @@ class Field{
             const deltaX = touchMove["clientX"]-this.mousePos[0];
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
-            this.piecePosAtTouchStart[0] += deltaY;
-            this.piecePosAtTouchStart[1] += deltaX;
-            //diff between init touch and initial piece pos must be added to every delta
+            this.piecePosAtTouchStart[0] += deltaX;
+            this.piecePosAtTouchStart[1] += deltaY;
             const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w+0.5);
-            this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
+            //this.logToServer({x:newGridX,centerX:this.livePiece.center[0]});
             let count = this.w;
             if(this.active)
             while(this.livePiece.center[0] != newGridX && count > 0)
@@ -631,7 +630,7 @@ class Field{
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
         if(dotProduct){
             //this.logToServer({anglew:angle, mag:mag});
-            if(mag > 25)//swipe identified
+            if(mag > 10)//swipe identified
             {   
                 if(angle < 0)//swipe downwards
                 {
