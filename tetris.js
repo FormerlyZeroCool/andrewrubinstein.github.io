@@ -616,7 +616,7 @@ class Field{
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
             const mag = this.mag([deltaX, deltaY]);
-            this.logToServer({mag:mag})
+            //this.logToServer({mag:mag})
             this.touchMoveCount++;
             this.deltaTouch += Math.abs(mag);
             this.touchVelocity = this.deltaTouch/this.touchMoveCount; 
@@ -686,8 +686,9 @@ class Field{
             const b = [1,0];
             const dotProduct = this.dotProduct(a, b);
             const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+            const delay = Date.now()-this.lastTouchTime;// from start tap to finish
             this.touchVelocity = 100*mag/(Date.now()-this.lastTouchTime)
-                this.logToServer({vel:this.touchVelocity, mag:mag});
+                //this.logToServer({vel:this.touchVelocity, mag:mag});
                 if(this.touchVelocity > 30 && this.active)//swipe identified
                 {   
                     if(angle < 0)//swipe downwards
@@ -706,7 +707,7 @@ class Field{
                     }
                 }
         
-                else if(this.touchVelocity < 1.8)//tap registered
+                else if(this.touchVelocity < 1.8 && delay < 500)//tap registered
                 {
                     if(this.touchStart["clientX"] > this.boundedWidth)
                     {
