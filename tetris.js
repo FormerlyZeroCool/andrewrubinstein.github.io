@@ -671,7 +671,7 @@ class Field{
                 {
                     if(angle >= 45 && angle <= 135)
                     {
-                        this.holdLive();
+                        this.rotate();
                     }
                 }
             }
@@ -683,7 +683,7 @@ class Field{
                 }
                 else
                 {
-                    this.rotate();
+                    this.holdLive();
                 }
             }
         }
