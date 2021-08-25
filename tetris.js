@@ -125,7 +125,6 @@ class Field{
         this.touchStart;
         this.lastTouchTime = Date.now();
         this.lastTouchStart;
-        this.ignoreEndTouch = false;
         this.piecePosAtTouchStart = [0,0];
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
@@ -210,21 +209,21 @@ class Field{
     holdLive()
     {
         this.clear(this.livePiece);
-            const type = this.livePiece.type;
-            let old = this.pieceTypes.find(el => el.type === type);
-            old.center = [this.w/2, 1];
-            this.piecePosAtTouchStart = [this.w/2, 1];
-            if(this.holdPiece && this.holdPiece.type != "null")
-            {
-                this.livePiece = this.holdPiece;
-            }
-            else
-            {
-                this.livePiece = this.pieceQueue.pop();
-                this.pieceQueue.push(this.genRandomNewPiece());
-            }
-            this.holdPiece = old;
-            this.place(this.livePiece);
+        const type = this.livePiece.type;
+        let old = this.pieceTypes.find(el => el.type === type);
+        old.center = [this.w/2, 1];
+        this.piecePosAtTouchStart = [this.w/2, 1];
+        if(this.holdPiece && this.holdPiece.type != "null")
+        {
+            this.livePiece = this.holdPiece;
+        }
+        else
+        {
+            this.livePiece = this.pieceQueue.pop();
+            this.pieceQueue.push(this.genRandomNewPiece());
+        }
+        this.holdPiece = old;
+        this.place(this.livePiece);
     }
     hardDrop()
     {
@@ -235,6 +234,7 @@ class Field{
         this.livePiece = this.pieceQueue.pop();
         this.pieceQueue.push(this.genRandomNewPiece());
         this.livePiece.center = [this.w/2, 1];
+        this.piecePosAtTouchStart = [this.w/2, 1];
         this.place(this.livePiece);
     }
     moveDown()
@@ -247,34 +247,34 @@ class Field{
     onKeyPress(event)
     {
         if(this.active)
-        if(event.code === "Space")//Hard drop
-        {
-            this.hardDrop();
-        }
-        else if((event.code === "KeyW" || event.keyCode === 38))//rotate
-        {
-            this.rotate();
-        }
-        else if(event.code === "KeyA" || event.keyCode === 37)//move/translate left
-        {
-            this.moveLeft();
-        }
-        else if(event.code === "KeyD" || event.keyCode === 39)//move/translate right
-        {
-            this.moveRight();
-        }
-        else if(event.code === "KeyS" || event.keyCode === 40)//move/translate down
-        {
-            this.moveDown();
-        }
-        else if(event.code == "KeyE")//Hold piece implementation
-        {
-            this.holdLive();
-        }
-        if(event.code === "KeyP")//pause/unpause
-        {
-            this.active = !this.active;
-        }
+            if(event.code === "Space")//Hard drop
+            {
+                this.hardDrop();
+            }
+            else if((event.code === "KeyW" || event.keyCode === 38))//rotate
+            {
+                this.rotate();
+            }
+            else if(event.code === "KeyA" || event.keyCode === 37)//move/translate left
+            {
+                this.moveLeft();
+            }
+            else if(event.code === "KeyD" || event.keyCode === 39)//move/translate right
+            {
+                this.moveRight();
+            }
+            else if(event.code === "KeyS" || event.keyCode === 40)//move/translate down
+            {
+                this.moveDown();
+            }
+            else if(event.code == "KeyE")//Hold piece implementation
+            {
+                this.holdLive();
+            }
+            if(event.code === "KeyP")//pause/unpause
+            {
+                this.active = !this.active;
+            }
     }
     clear(piece)
     {
@@ -581,7 +581,6 @@ class Field{
         this.touchStart = event.changedTouches.item(0);
         this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
         this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
-        this.ignoreEndTouch = false;
         event.preventDefault();
     }
     onTouchMove(event)
@@ -607,7 +606,6 @@ class Field{
             const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
             if(mag > 0.5 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
             {
-                this.ignoreEndTouch = true;
                 this.piecePosAtTouchStart[0] += deltaX;
                 const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
 
@@ -629,7 +627,6 @@ class Field{
             }
             else if(mag > 0.3 && angle <= -65 && angle >= -115)
             {
-                this.ignoreEndTouch = true;
                 this.piecePosAtTouchStart[1] += deltaY*4;
                 const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
                 this.clear(this.livePiece);
@@ -659,7 +656,7 @@ class Field{
         const b = [1,0];
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-        if(dotProduct && !this.ignoreEndTouch){
+        if(dotProduct){
             //this.logToServer({anglew:angle, mag:mag});
             if(mag > 10)//swipe identified
             {   
@@ -741,7 +738,7 @@ async function main()
         ctx.fillStyle = "#FF0000";
         if(count % (f.maxLevel - f.level) == 0)
             f.update()
-        f.draw()
+        f.draw();
     }
 }
 main();
