@@ -629,7 +629,7 @@ class Field{
             else if(mag > 0.3 && angle <= -65 && angle >= -115)
             {
                 this.ignoreEndTouch = true;
-                this.piecePosAtTouchStart[1] += deltaY*3;
+                this.piecePosAtTouchStart[1] += deltaY*4;
                 const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
                 this.clear(this.livePiece);
                 while(this.livePiece.center[1] <= newGridY && this.isClearBelow(this.livePiece))
