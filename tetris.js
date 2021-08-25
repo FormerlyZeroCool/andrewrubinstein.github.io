@@ -16,12 +16,14 @@ class Queue {
     {
         if(this.length == this.data.length)
         {
-            console.log("Error queue limit reached!");
+            throw new Error("Error queue limit reached!");
         }
+        else
+        {
             this.data[this.end++] = val; 
             this.end %= this.data.length;
             this.length++;
-        
+        }
     }
     pop()
     {
@@ -33,7 +35,7 @@ class Queue {
             this.length--;
             return val;
         }
-        return false;
+        throw new Error("No more values in the queue");
     }
     get(index)
     {
@@ -41,7 +43,7 @@ class Queue {
         {
             return this.data[(index+this.start)%this.data.length];
         }
-        return false;
+		throw new Error(`Could not get value at index ${index}`);
     }
     set(index, obj)
     {
@@ -49,6 +51,7 @@ class Queue {
         {
             this.data[(index+this.start)%this.data.length] = obj;
         }
+		throw new Error(`Could not set value at index ${index}`);
     }
 }
 
@@ -122,6 +125,7 @@ class Field{
         this.touchStart;
         this.lastTouchTime = Date.now();
         this.lastTouchStart;
+        this.ignoreEndTouch = false;
         this.piecePosAtTouchStart = [0,0];
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
@@ -434,6 +438,7 @@ class Field{
             this.livePiece = this.pieceQueue.pop();
             //ensure it is in the correct position
             this.livePiece.center = [this.w/2, 1];
+            this.piecePosAtTouchStart = [this.w/2, 1];
             //add new piece to queue of next pieces
             this.pieceQueue.push(this.genRandomNewPiece());
             //check if top row is full
@@ -575,10 +580,11 @@ class Field{
         this.touchStart = event.changedTouches.item(0);
         this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
         this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
+        this.ignoreEndTouch = false;
         event.preventDefault();
     }
     onTouchMove(event)
-    {   
+    {           
         let touchMove = event.changedTouches.item(0);
         for(let i = 0; i < event.changedTouches["length"]; i++)
         {
@@ -593,34 +599,47 @@ class Field{
             this.mousePos[1] += deltaY;
             this.mousePos[0] += deltaX;
 
-        const mag = this.mag([deltaX, deltaY]);
-        const a = this.normalize([deltaX, deltaY]);
-        const b = [1,0];
-        const dotProduct = this.dotProduct(a, b);
-        const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-        if(mag > 0.5 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
-        {
-            this.piecePosAtTouchStart[0] += deltaX;
-            this.piecePosAtTouchStart[1] += deltaY;
-            const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
-            //this.logToServer({x:newGridX,mag:mag,angle:angle});
-            let count = this.w;
-            if(this.active)
-            while(this.livePiece.center[0] != newGridX && count > 0)
+            const mag = this.mag([deltaX, deltaY]);
+            const a = this.normalize([deltaX, deltaY]);
+            const b = [1,0];
+            const dotProduct = this.dotProduct(a, b);
+            const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+            if(mag > 0.5 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
             {
-                count--;
-                if(this.livePiece.center[0] < newGridX)
+                this.ignoreEndTouch = true;
+                this.piecePosAtTouchStart[0] += deltaX;
+                const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
+
+                let count = this.w;
+                if(this.active)
+                while(this.livePiece.center[0] != newGridX && count > 0)
                 {
-                    this.moveRight();
+                    count--;
+                    if(this.livePiece.center[0] < newGridX)
+                    {
+                        this.moveRight();
+                    }
+                    else
+                    {
+                        this.moveLeft();
+                    }
                 }
-                else
+
+            }
+            else if(mag > 0.3 && angle <= -75 && angle >= -105)
+            {
+                this.ignoreEndTouch = true;
+                this.piecePosAtTouchStart[1] += deltaY*3;
+                const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
+                this.clear(this.livePiece);
+                while(this.livePiece.center[1] <= newGridY && this.isClearBelow(this.livePiece))
                 {
-                    this.moveLeft();
+                    this.livePiece.center[1]++;
                 }
+                this.place(this.livePiece);
+
             }
 
-        }
-        
         }
     }
     onTouchEnd(event)
@@ -639,7 +658,7 @@ class Field{
         const b = [1,0];
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-        if(dotProduct){
+        if(dotProduct && !this.ignoreEndTouch){
             //this.logToServer({anglew:angle, mag:mag});
             if(mag > 10)//swipe identified
             {   
