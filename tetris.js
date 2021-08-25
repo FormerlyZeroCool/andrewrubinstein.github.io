@@ -213,6 +213,7 @@ class Field{
             const type = this.livePiece.type;
             let old = this.pieceTypes.find(el => el.type === type);
             old.center = [this.w/2, 1];
+            this.piecePosAtTouchStart = [this.w/2, 1];
             if(this.holdPiece && this.holdPiece.type != "null")
             {
                 this.livePiece = this.holdPiece;
