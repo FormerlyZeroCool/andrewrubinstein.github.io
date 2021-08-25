@@ -553,7 +553,9 @@ class Field{
         {
             this.ctx.font = '48px Calibri';
             this.ctx.fillStyle = "#DF0000";
+            this.ctx.strokeStyle = "#FFFFFF";
             this.ctx.fillText('Game Paused', this.boundedWidth/2 - this.boundedWidth/4, this.boundedHeight/2);
+            this.ctx.strokeText('Game Paused', this.boundedWidth/2 - this.boundedWidth/4, this.boundedHeight/2);
         }
         
     }
