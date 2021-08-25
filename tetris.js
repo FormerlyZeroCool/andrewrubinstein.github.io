@@ -549,7 +549,12 @@ class Field{
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
                 }
             }
-        
+        if(!this.active)
+        {
+            this.ctx.font = '48px Calibri';
+            this.ctx.fillStyle = "#DF0000";
+            this.ctx.fillText('Game Paused', this.boundedWidth/2 - this.boundedWidth/4, this.boundedHeight/2);
+        }
         
     }
     mag(a)
