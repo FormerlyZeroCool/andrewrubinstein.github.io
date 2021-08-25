@@ -626,7 +626,7 @@ class Field{
                 }
 
             }
-            else if(mag > 0.3 && angle <= -75 && angle >= -105)
+            else if(mag > 0.3 && angle <= -65 && angle >= -115)
             {
                 this.ignoreEndTouch = true;
                 this.piecePosAtTouchStart[1] += deltaY*3;
