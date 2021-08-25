@@ -622,7 +622,7 @@ class Field{
             const b = [1,0];
             const dotProduct = this.dotProduct(a, b);
             const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-            if(mag > 0.5 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
+            if(mag > 0.4 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
             {
                 this.piecePosAtTouchStart[0] += deltaX;
                 const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
@@ -675,9 +675,10 @@ class Field{
         const b = [1,0];
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+        this.touchVelocity = 100*mag/(Date.now()-this.lastTouchTime)
         if(dotProduct){
-            //this.logToServer({vel:this.touchVelocity, mag:mag});
-            if(this.touchVelocity > 5 && this.active)//swipe identified
+            this.logToServer({vel:this.touchVelocity, mag:mag});
+            if(this.touchVelocity > 30 && this.active)//swipe identified
             {   
                 if(angle < 0)//swipe downwards
                 {
@@ -694,7 +695,7 @@ class Field{
                     }
                 }
             }
-            else if(this.touchVelocity < 1)//tap registered
+            else if(this.touchVelocity < 1.8)//tap registered
             {
                 if(this.touchStart["clientX"] > this.boundedWidth)
                 {
