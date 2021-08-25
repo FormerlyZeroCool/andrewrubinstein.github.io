@@ -125,6 +125,9 @@ class Field{
         this.touchStart;
         this.lastTouchTime = Date.now();
         this.lastTouchStart;
+        this.touchVelocity = 0;
+        this.deltaTouch = 0;
+        this.touchMoveCount = 0;
         this.piecePosAtTouchStart = [0,0];
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
@@ -213,6 +216,9 @@ class Field{
         let old = this.pieceTypes.find(el => el.type === type);
         old.center = [this.w/2, 1];
         this.piecePosAtTouchStart = [this.w/2, 1];
+        this.touchVelocity = 0;
+        this.touchMoveCount = 0;
+        this.deltaTouch = 0;
         if(this.holdPiece && this.holdPiece.type != "null")
         {
             this.livePiece = this.holdPiece;
@@ -235,6 +241,9 @@ class Field{
         this.pieceQueue.push(this.genRandomNewPiece());
         this.livePiece.center = [this.w/2, 1];
         this.piecePosAtTouchStart = [this.w/2, 1];
+        this.touchVelocity = 0;
+        this.touchMoveCount = 0;
+        this.deltaTouch = 0;
         this.place(this.livePiece);
     }
     moveDown()
@@ -440,6 +449,9 @@ class Field{
             //ensure it is in the correct position
             this.livePiece.center = [this.w/2, 1];
             this.piecePosAtTouchStart = [this.w/2, 1];
+            this.touchVelocity = 0;
+            this.touchMoveCount = 0;
+            this.deltaTouch = 0;
             //add new piece to queue of next pieces
             this.pieceQueue.push(this.genRandomNewPiece());
             //check if top row is full
@@ -581,6 +593,9 @@ class Field{
         this.touchStart = event.changedTouches.item(0);
         this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
         this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
+        this.touchVelocity = 0;
+        this.touchMoveCount = 0;
+        this.deltaTouch = 0;
         event.preventDefault();
     }
     onTouchMove(event)
@@ -600,6 +615,9 @@ class Field{
             this.mousePos[0] += deltaX;
 
             const mag = this.mag([deltaX, deltaY]);
+            this.touchMoveCount++;
+            this.deltaTouch += Math.abs(mag);
+            this.touchVelocity = this.deltaTouch/this.touchMoveCount; 
             const a = this.normalize([deltaX, deltaY]);
             const b = [1,0];
             const dotProduct = this.dotProduct(a, b);
@@ -630,6 +648,7 @@ class Field{
                 this.piecePosAtTouchStart[1] += deltaY*4;
                 const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
                 this.clear(this.livePiece);
+                if(this.active)
                 while(this.livePiece.center[1] <= newGridY && this.isClearBelow(this.livePiece))
                 {
                     this.livePiece.center[1]++;
@@ -657,8 +676,8 @@ class Field{
         const dotProduct = this.dotProduct(a, b);
         const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
         if(dotProduct){
-            //this.logToServer({anglew:angle, mag:mag});
-            if(mag > 10)//swipe identified
+            //this.logToServer({vel:this.touchVelocity, mag:mag});
+            if(this.touchVelocity > 5 && this.active)//swipe identified
             {   
                 if(angle < 0)//swipe downwards
                 {
@@ -671,19 +690,19 @@ class Field{
                 {
                     if(angle >= 45 && angle <= 135)
                     {
-                        this.rotate();
+                        this.holdLive();
                     }
                 }
             }
-            else//tap registered
+            else if(this.touchVelocity < 1)//tap registered
             {
                 if(this.touchStart["clientX"] > this.boundedWidth)
                 {
                     this.active = !this.active;
                 }
-                else
+                else if(this.active)
                 {
-                    this.holdLive();
+                    this.rotate();
                 }
             }
         }
