@@ -654,7 +654,7 @@ class Field{
             }
             else if(mag > 0.3 && angle <= -65 && angle >= -115)
             {
-                this.piecePosAtTouchStart[1] += deltaY*4;
+                this.piecePosAtTouchStart[1] += deltaY*3;
                 const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
                 this.clear(this.livePiece);
                 if(this.active)
