@@ -228,12 +228,12 @@ class Field{
     touchend_hardDropPred(event)
     {
         //swipe down identified  
-        return (this.active && event.mag > 50 && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135 && event.timeDelayFromStartToEnd < 200);
+        return (this.active && event.deltaY > 40 && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135 && event.timeDelayFromStartToEnd < 200);
     }
     touchend_holdLivePred(event)
     {
         //swipe up identified
-        return (this.active && event.mag > 50 && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135 && event.timeDelayFromStartToEnd < 200);        
+        return (this.active && event.deltaY > 40 && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135 && event.timeDelayFromStartToEnd < 200);        
     }
     genRandomNewPiece()
     {
