@@ -219,7 +219,7 @@ class Field{
     touchend_pausePred(event)
     {
         //tap registered
-        return (this.active && event.avgVelocity <= 30 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] > this.boundedWidth);
+        return (event.avgVelocity <= 30 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] > this.boundedWidth);
     }
     touchend_hardDropPred(event)
     {
