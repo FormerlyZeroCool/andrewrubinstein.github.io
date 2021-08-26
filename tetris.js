@@ -3,6 +3,35 @@
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+function mag(a)
+{
+    let sum = 0;
+    for(let i = 0; i < a.length; i++)
+    {
+        sum += a[i]*a[i];
+    }
+    return Math.sqrt(sum);
+}
+function normalize(a)
+{
+    const magA = this.mag(a);
+    for(let i = 0; i < a.length; i++)
+    {
+        a[i] /= magA;
+    }
+    return a;
+}
+function dotProduct(a, b)
+{
+    if(a.length != b.length)
+        return false;
+    let sum = 0;
+    for(let i = 0; i < a.length; i++)
+    {
+        sum += a[i]*b[i];
+    }
+    return sum;
+}
 class Queue {
     constructor(size)
     {
@@ -122,13 +151,15 @@ class Field{
             }
 
         ];
-        this.touchStart;
-        this.lastTouchTime = Date.now();
-        this.lastTouchStart;
-        this.touchVelocity = 0;
-        this.deltaTouch = 0;
-        this.touchMoveCount = 0;
         this.piecePosAtTouchStart = [0,0];
+        this.listenerHandler = new SingleTouchListener(canvas, true);
+        this.listenerHandler.registerCallBack("touchmove", e => this.touchmove_slideHPred(e), e => this.hSlide(e));
+        this.listenerHandler.registerCallBack("touchmove", e => this.touchmove_slideVPred(e), e => this.vSlide(e));
+        this.listenerHandler.registerCallBack("touchend", e => this.touchend_rotatePred(e), e => this.rotate());
+        this.listenerHandler.registerCallBack("touchend", e => this.touchend_hardDropPred(e), e => this.hardDrop());
+        this.listenerHandler.registerCallBack("touchend", e => this.touchend_holdLivePred(e), e => this.holdLive());
+        this.listenerHandler.registerCallBack("touchend", e => this.touchend_pausePred(e), e => this.active = !this.active);
+        
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
@@ -141,6 +172,64 @@ class Field{
         {
             this.field.push({color:"#000000"});
         }
+    }    
+    hSlide(event)
+    {
+        this.piecePosAtTouchStart[0] += event.deltaX;
+        const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w)
+        let count = this.w;
+        if(this.active)
+        while(this.livePiece.center[0] != newGridX && count > 0)
+        {
+            count--;
+            if(this.livePiece.center[0] < newGridX)
+            {
+                this.moveRight();
+            }
+            else
+            {
+                this.moveLeft();
+            }
+        }
+    }
+    vSlide(event)
+    {
+        this.piecePosAtTouchStart[1] += event.deltaY*3;
+        const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
+        this.clear(this.livePiece);
+        if(this.active)
+        while(this.livePiece.center[1] <= newGridY && this.isClearBelow(this.livePiece))
+        {
+            this.livePiece.center[1]++;
+        }
+        this.place(this.livePiece);
+    }
+    touchmove_slideHPred(event)
+    {
+        return this.active && (event.mag > 0.4 && (Math.abs(event.angle) >= 165 || Math.abs(event.angle) <= 15));
+    }
+    touchmove_slideVPred(event)
+    {
+        return this.active && (event.mag > 0.2 && event.angle <= -65 && event.angle >= -115);
+    }
+    touchend_rotatePred(event)
+    {
+        return this.active && event.avgVelocity <= 30 && event.mag < 15 && event.timeDelayFromStartToEnd < 250;
+    }
+    touchend_pausePred(event)
+    {
+        //tap registered
+        return (this.active && event.avgVelocity <= 30 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] > this.boundedWidth);
+    }
+    touchend_hardDropPred(event)
+    {
+        //swipe down identified  
+        return (this.active && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135);
+    }
+    touchend_holdLivePred(event)
+    {
+        //swipe up identified
+        return (this.active && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135);        
     }
     genRandomNewPiece()
     {
@@ -154,11 +243,11 @@ class Field{
  
         return newPiece;
     }
-    rotateRight(piece){
+    rotateLeft(piece){
         for(let i = 0; i < piece.vectors.length; i++)
         {
-            const temp = piece.vectors[i][1]*-1;
-            piece.vectors[i][1] = piece.vectors[i][0];
+            const temp = piece.vectors[i][1];
+            piece.vectors[i][1] = piece.vectors[i][0]*-1;
             piece.vectors[i][0] = temp;
         }
     }
@@ -202,7 +291,7 @@ class Field{
         {
             this.clear(this.livePiece);
             const newPiece = this.clonePiece(this.livePiece);
-            this.rotateRight(newPiece);
+            this.rotateLeft(newPiece);
             if(this.isClearTranslated(newPiece,[0,0])){
                 this.livePiece = newPiece;
             }
@@ -446,6 +535,11 @@ class Field{
             this.place(this.livePiece);
             //get next live piece
             this.livePiece = this.pieceQueue.pop();
+            this.resetTouch();
+            if(this.listenerHandler.registeredTouch)
+            {
+                this.listenerHandler.registeredTouch = false;
+            }
             //ensure it is in the correct position
             this.livePiece.center = [this.w/2, 1];
             this.touchVelocity = 0;
@@ -454,7 +548,6 @@ class Field{
             //add new piece to queue of next pieces
             this.pieceQueue.push(this.genRandomNewPiece());
 
-            this.resetTouch();
             //check if top row is full
             const topRow = {type:"none", center:[0,0],vectors:[],color:"#000000"};
             //building vectors to point to top row
@@ -591,157 +684,166 @@ class Field{
     resetTouch()
     {
         this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
+    }
+
+    
+};
+function logToServer(data)
+{
+    fetch("/data", {
+        method: "POST", 
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }).then(res => {console.log("Request complete! response:", data);});
+
+}
+class SingleTouchListener
+{
+    constructor(component, preventDefault)
+    {
+        this.lastTouchTime = Date.now();
+        this.preventDefault = preventDefault;
+        this.touchStart = null;
+        this.registeredTouch = false;
+        this.touchPos = [0,0];
         this.touchVelocity = 0;
         this.touchMoveCount = 0;
-        this.deltaTouch = 0;
+        this.deltaTouchPos = 0;
+        this.listenerTypeMap = {
+            touchstart:[],
+            touchmove:[],
+            touchend:[]
+        };
+        component.addEventListener('touchstart', event => {this.touchStartHandler(event);}, false);
+        component.addEventListener('touchmove', event => this.touchMoveHandler(event), false);
+        component.addEventListener('touchend', event => this.touchEndHandler(event), false);
+        
     }
-    onTouchStart(event)
+    registerCallBack(listenerType, predicate, callBack)
     {
-        this.lastTouchStart = [this.touchStart, this.lastTouchTime];
+        this.listenerTypeMap[listenerType].push({pred:predicate, callBack:callBack});
+    }
+    callHandler(type, event)
+    {
+        const handlers = this.listenerTypeMap[type];
+        handlers.forEach(handler => {
+            if(handler.pred(event))
+            {
+                handler.callBack(event);
+            }
+        });
+    }
+    touchStartHandler(event)
+    {
+        this.registeredTouch = true;
         this.lastTouchTime = Date.now();
         this.touchStart = event.changedTouches.item(0);
-        this.mousePos = [this.touchStart["clientX"],this.touchStart["clientY"]];
-        this.piecePosAtTouchStart = [this.livePiece.center[0]*this.boundedWidth/this.w,this.livePiece.center[1]*this.boundedHeight/this.h];
+        this.touchPos = [this.touchStart["clientX"],this.touchStart["clientY"]];
+        event.touchPos = this.touchPos;
+
         this.touchVelocity = 0;
         this.touchMoveCount = 0;
-        this.deltaTouch = 0;
-        event.preventDefault();
+        this.deltaTouchPos = 0;
+        this.callHandler("touchstart", event);
+
+        if(this.preventDefault)
+            event.preventDefault();
     }
-    onTouchMove(event)
-    {           
+    touchMoveHandler(event)
+    {
+       if(!this.registeredTouch)
+            return false;
         let touchMove = event.changedTouches.item(0);
         for(let i = 0; i < event.changedTouches["length"]; i++)
         {
             if(event.changedTouches.item(i).identifier == this.touchStart.identifier){
                 touchMove = event.changedTouches.item(i);
             }
-        } 
+        }  
+        
         if(touchMove)
         {
-            const deltaY = touchMove["clientY"]-this.mousePos[1];
-            const deltaX = touchMove["clientX"]-this.mousePos[0];
-            this.mousePos[1] += deltaY;
-            this.mousePos[0] += deltaX;
+            const deltaY = touchMove["clientY"]-this.touchPos[1];
+            const deltaX = touchMove["clientX"]-this.touchPos[0];
+            this.touchPos[1] += deltaY;
+            this.touchPos[0] += deltaX;
             const mag = this.mag([deltaX, deltaY]);
-            //this.logToServer({mag:mag})
             this.touchMoveCount++;
-            this.deltaTouch += Math.abs(mag);
-            this.touchVelocity = this.deltaTouch/this.touchMoveCount; 
+            this.deltaTouchPos += Math.abs(mag);
+            this.touchVelocity = 100*this.deltaTouchPos/(Date.now() - this.lastTouchTime); 
             const a = this.normalize([deltaX, deltaY]);
             const b = [1,0];
             const dotProduct = this.dotProduct(a, b);
             const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-            if(mag > 0.4 && (Math.abs(angle) >= 165 || Math.abs(angle) <= 15))
+            event.deltaX = deltaX;
+            event.deltaY = deltaY;
+            event.mag = mag;
+            event.angle = angle;
+            event.avgVelocity = this.touchVelocity;
+            event.touchPos = this.touchPos;
+            event.startTouchTime = this.lastTouchTime;
+            event.eventTime = Date.now();
+            this.callHandler("touchmove", event);
+        }
+        return true;
+    }
+    touchEndHandler(event)
+    {
+        if(this.registeredTouch)
+        {
+            let touchEnd = event.changedTouches.item(0);
+            for(let i = 0; i < event.changedTouches["length"]; i++)
             {
-                this.piecePosAtTouchStart[0] += deltaX;
-                const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w);
-
-                let count = this.w;
-                if(this.active)
-                while(this.livePiece.center[0] != newGridX && count > 0)
-                {
-                    count--;
-                    if(this.livePiece.center[0] < newGridX)
-                    {
-                        this.moveRight();
-                    }
-                    else
-                    {
-                        this.moveLeft();
-                    }
+                if(event.changedTouches.item(i).identifier == this.touchStart.identifier){
+                    touchEnd = event.changedTouches.item(i);
                 }
-
-            }
-            else if(mag > 0.3 && angle <= -65 && angle >= -115)
+            } 
+            if(touchEnd)
             {
-                this.piecePosAtTouchStart[1] += deltaY*3;
-                const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
-                this.clear(this.livePiece);
-                if(this.active)
-                while(this.livePiece.center[1] <= newGridY && this.isClearBelow(this.livePiece))
-                {
-                    this.livePiece.center[1]++;
-                }
-                this.place(this.livePiece);
+                const deltaY = touchEnd["clientY"]-this.touchStart["clientY"];
+                const deltaX = touchEnd["clientX"]-this.touchStart["clientX"];
+                this.touchPos = [touchEnd["clientX"], touchEnd["clientY"]];
+                const mag = this.mag([deltaX, deltaY]);
+                const a = this.normalize([deltaX, deltaY]);
+                const b = [1,0];
+                const dotProduct = this.dotProduct(a, b);
+                const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
+                const delay = Date.now()-this.lastTouchTime;// from start tap to finish
+                this.touchVelocity = 100*mag/(Date.now()-this.lastTouchTime)
 
+                event.deltaX = deltaX;
+                event.deltaY = deltaY;
+                event.mag = mag;
+                event.angle = angle;
+                event.avgVelocity = this.touchVelocity;
+                event.touchPos = this.touchPos
+                event.timeDelayFromStartToEnd = delay;
+                event.startTouchTime = this.lastTouchTime;
+                event.eventTime = Date.now();
+                this.callHandler("touchend", event);
             }
 
+            this.registeredTouch = false;
         }
     }
-    onTouchEnd(event)
+    mag(a)
     {
-        //let a = vector between start, and end
-        //let b = normal vector for x [1,0]
-        //normalize vect a by dividing both components by mag(a) and then take the dot product of that normalized vector a an b, then take the inverse cos
-        //because mag of both will be one no need to divide by mag(a)*mag(b)
-        //to get the angle, if mag is greater than some number to be defined after testing
-        //then use angle to calc direction and determine what event handler to fire
-              
-        let touchEnd = event.changedTouches.item(0);
-        for(let i = 0; i < event.changedTouches["length"]; i++)
-        {
-            if(event.changedTouches.item(i).identifier == this.touchStart.identifier){
-                touchEnd = event.changedTouches.item(i);
-            }
-        } 
-        if(touchEnd)
-        {
-            const deltaY = touchEnd["clientY"]-this.touchStart["clientY"];
-            const deltaX = touchEnd["clientX"]-this.touchStart["clientX"];
-            const mag = this.mag([deltaX, deltaY]);
-            const a = this.normalize([deltaX, deltaY]);
-            const b = [1,0];
-            const dotProduct = this.dotProduct(a, b);
-            const angle = Math.acos(dotProduct)*(180/Math.PI)*(deltaY<0?1:-1);
-            const delay = Date.now()-this.lastTouchTime;// from start tap to finish
-            this.touchVelocity = 100*mag/(Date.now()-this.lastTouchTime)
-                //this.logToServer({vel:this.touchVelocity, mag:mag});
-                if(this.touchVelocity > 30 && this.active)//swipe identified
-                {   
-                    if(angle < 0)//swipe downwards
-                    {
-                        if(Math.abs(angle) >= 45 && Math.abs(angle) <= 135)
-                        {
-                            this.hardDrop();
-                        }
-                    }
-                    else//swipe upwards
-                    {
-                        if(angle >= 45 && angle <= 135)
-                        {
-                            this.holdLive();
-                        }
-                    }
-                }
-        
-                else if(this.touchVelocity < 1.8 && delay < 500)//tap registered
-                {
-                    if(this.touchStart["clientX"] > this.boundedWidth)
-                    {
-                        this.active = !this.active;
-                    }
-                    else if(this.active)
-                    {
-                        this.rotate();
-                    }
-                }
-        
-        
-        }
-        
+        return Math.sqrt(a[0]*a[0]+a[1]*a[1]);
     }
-    logToServer(data)
+    normalize(a)
     {
-        fetch("/data", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-          }).then(res => {console.log("Request complete! response:", data);});
-    
+        const magA = this.mag(a);
+        a[0] /= magA;
+        a[1] /= magA;
+        return a;
     }
-};
+    dotProduct(a, b)
+    {
+        return a[0]*b[0]+a[1]*b[1];
+    }
+}
 async function main()
 {
    
@@ -752,20 +854,18 @@ async function main()
     ctx.fillStyle = "#FF0000";
     let x = 0
     dim = canvas.width;
-    let f = new Field(canvas, ctx, 15);
-    canvas.addEventListener("click", (event) => f.onClickField(event) );
-    canvas.addEventListener("mousemove",(event) => f.onMouseMove(event) );
-    canvas.addEventListener('touchstart', event => f.onTouchStart(event), false);
-    canvas.addEventListener('touchmove', event => f.onTouchMove(event), false);
-    canvas.addEventListener('touchend', event => f.onTouchEnd(event), false);
+    let field = new Field(canvas, ctx, 15);
+    canvas.addEventListener("click", (event) => field.onClickField(event) );
+    canvas.addEventListener("mousemove",(event) => field.onMouseMove(event) );
+
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
-          f.onKeyPress(e)
+          field.onKeyPress(e)
         }
         else
         {
-            f.onKeyPress(e);
+            field.onKeyPress(e);
         }
       });
     let count = 0;
@@ -775,9 +875,9 @@ async function main()
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0,0,canvas.width,canvas.height)
         ctx.fillStyle = "#FF0000";
-        if(count % (f.maxLevel - f.level) == 0)
-            f.update()
-        f.draw();
+        if(count % (field.maxLevel - field.level) == 0)
+            field.update()
+        field.draw();
     }
 }
 main();
