@@ -233,7 +233,7 @@ class Field{
     touchend_holdLivePred(event)
     {
         //swipe up identified
-        return (this.active && event.deltaY > 40 && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135 && event.timeDelayFromStartToEnd < 200);        
+        return (this.active && event.deltaY < -40 && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135 && event.timeDelayFromStartToEnd < 200);        
     }
     genRandomNewPiece()
     {
