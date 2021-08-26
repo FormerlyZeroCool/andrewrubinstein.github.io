@@ -228,12 +228,12 @@ class Field{
     touchend_hardDropPred(event)
     {
         //swipe down identified  
-        return (this.active && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135);
+        return (this.active && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135 && event.timeDelayFromStartToEnd < 200);
     }
     touchend_holdLivePred(event)
     {
         //swipe up identified
-        return (this.active && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135);        
+        return (this.active && event.avgVelocity > 30 && event.angle >= 45 && event.angle <= 135 && event.timeDelayFromStartToEnd < 200);        
     }
     genRandomNewPiece()
     {
@@ -732,9 +732,11 @@ class SingleTouchListener
     callHandler(type, event)
     {
         const handlers = this.listenerTypeMap[type];
+        let found = false;
         handlers.forEach(handler => {
-            if(handler.pred(event))
+            if(!found && handler.pred(event))
             {
+                found = true;
                 handler.callBack(event);
             }
         });
