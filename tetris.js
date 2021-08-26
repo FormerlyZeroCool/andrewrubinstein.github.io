@@ -175,6 +175,8 @@ class Field{
     }    
     hSlide(event)
     {
+        if(this.piecePosAtTouchStart[0] == 0)
+            this.resetTouch();
         this.piecePosAtTouchStart[0] += event.deltaX;
         const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w)
         let count = this.w;
@@ -194,6 +196,8 @@ class Field{
     }
     vSlide(event)
     {
+        if(this.piecePosAtTouchStart[1] == 0)
+            this.resetTouch();
         this.piecePosAtTouchStart[1] += event.deltaY*3;
         const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
         this.clear(this.livePiece);
