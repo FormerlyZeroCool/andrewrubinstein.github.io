@@ -177,7 +177,7 @@ class Field{
     {
         if(this.piecePosAtTouchStart[0] == 0)
             this.resetTouch();
-        this.piecePosAtTouchStart[0] += event.deltaX;
+        this.piecePosAtTouchStart[0] += event.deltaX*1.3;
         const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w)
         let count = this.w;
         if(this.active)
@@ -198,7 +198,7 @@ class Field{
     {
         if(this.piecePosAtTouchStart[1] == 0)
             this.resetTouch();
-        this.piecePosAtTouchStart[1] += event.deltaY*3;
+        this.piecePosAtTouchStart[1] += event.deltaY*4;
         const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
         this.clear(this.livePiece);
         if(this.active)
@@ -210,7 +210,7 @@ class Field{
     }
     touchmove_slideHPred(event)
     {
-        return this.active && (event.mag > 0.4 && (Math.abs(event.angle) >= 165 || Math.abs(event.angle) <= 15));
+        return this.active && (event.mag > 0.45 && (Math.abs(event.angle) >= 165 || Math.abs(event.angle) <= 15));
     }
     touchmove_slideVPred(event)
     {
