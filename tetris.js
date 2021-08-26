@@ -214,7 +214,7 @@ class Field{
     }
     touchmove_slideVPred(event)
     {
-        return this.active && (event.mag > 0.2 && event.angle <= -65 && event.angle >= -115);
+        return this.active && (event.mag > 0.13 && event.angle <= -65 && event.angle >= -115);
     }
     touchend_rotatePred(event)
     {
