@@ -584,9 +584,9 @@ class Field{
         this.ctx.font = '16px Calibri';
         this.ctx.fillStyle = "#000000";
         this.ctx.fillText('Hold Piece:', 5+this.boundedWidth, 15);
-        this.ctx.fillText('Score: '+this.score, 5+this.boundedWidth, 15+height*6.8);
+        this.ctx.fillText('Score: '+this.score, 5+this.boundedWidth, 17+height*6.8);
         const levelText = this.level === (this.maxLevel-1)?"Max":this.level;
-        this.ctx.fillText('Level: '+levelText, 5+this.boundedWidth, 15+height*6.8+20);
+        this.ctx.fillText('Level: '+levelText, 5+this.boundedWidth, 17+height*6.8+20);
         for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
         {
             let field = [];
