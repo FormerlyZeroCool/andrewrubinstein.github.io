@@ -153,6 +153,7 @@ class Field{
         ];
         this.piecePosAtTouchStart = [0,0];
         this.listenerHandler = new SingleTouchListener(canvas, true);
+        this.listenerHandler.registerCallBack("touchstart", e => true, e => this.resetTouch());
         this.listenerHandler.registerCallBack("touchmove", e => this.touchmove_slideHPred(e), e => this.hSlide(e));
         this.listenerHandler.registerCallBack("touchmove", e => this.touchmove_slideVPred(e), e => this.vSlide(e));
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_rotatePred(e), e => this.rotate());
@@ -175,8 +176,6 @@ class Field{
     }    
     hSlide(event)
     {
-        if(this.piecePosAtTouchStart[0] == 0)
-            this.resetTouch();
         this.piecePosAtTouchStart[0] += event.deltaX*1.3;
         const newGridX = Math.floor(((this.piecePosAtTouchStart[0] > this.boundedWidth?this.boundedWidth:this.piecePosAtTouchStart[0])/this.boundedWidth)*this.w)
         let count = this.w;
@@ -196,8 +195,6 @@ class Field{
     }
     vSlide(event)
     {
-        if(this.piecePosAtTouchStart[1] == 0)
-            this.resetTouch();
         this.piecePosAtTouchStart[1] += event.deltaY*4;
         const newGridY = Math.floor(((this.piecePosAtTouchStart[1] > this.boundedHeight?this.boundedHeight:this.piecePosAtTouchStart[1])/this.boundedHeight)*this.h);
         this.clear(this.livePiece);
@@ -228,7 +225,7 @@ class Field{
     touchend_hardDropPred(event)
     {
         //swipe down identified  
-        return (this.active && event.deltaY > 40 && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135 && event.timeDelayFromStartToEnd < 200);
+        return (this.active && event.deltaY > 25 && event.avgVelocity > 30 && event.angle < 0 && Math.abs(event.angle) >= 45 && Math.abs(event.angle) <= 135 && event.timeDelayFromStartToEnd < 200);
     }
     touchend_holdLivePred(event)
     {
@@ -241,7 +238,7 @@ class Field{
     }
     clonePiece(piece)
     {
-        const newPiece = {type:piece.type,center:[piece.center[0], piece.center[1]], vectors:[], color:piece.color};
+        const newPiece = {type:piece.type,center:[piece.center[0], piece.center[1]], vectors:[], color:piece.color, swapped: false};
         for(let i = 0; i < piece.vectors.length; i++)
             newPiece.vectors.push([piece.vectors[i][0],piece.vectors[i][1]]);
  
@@ -304,25 +301,27 @@ class Field{
     }
     holdLive()
     {
-        this.clear(this.livePiece);
-        const type = this.livePiece.type;
-        let old = this.pieceTypes.find(el => el.type === type);
-        old.center = [this.w/2, 1];
-        this.touchVelocity = 0;
-        this.touchMoveCount = 0;
-        this.deltaTouch = 0;
-        if(this.holdPiece && this.holdPiece.type != "null")
+        if(!this.livePiece.swapped)
         {
-            this.livePiece = this.holdPiece;
+            this.clear(this.livePiece);
+            const type = this.livePiece.type;
+            let old = this.pieceTypes.find(el => el.type === type);
+            old.center = [this.w/2, 1];
+            if(this.holdPiece && this.holdPiece.type != "null")
+            {
+                this.livePiece = this.holdPiece;
+                this.holdPiece = old;
+            }
+            else
+            {
+                this.livePiece = this.pieceQueue.pop();
+                this.pieceQueue.push(this.genRandomNewPiece());
+                this.holdPiece = old;
+            }
+            this.livePiece.swapped = true;
+            this.place(this.livePiece);
         }
-        else
-        {
-            this.livePiece = this.pieceQueue.pop();
-            this.pieceQueue.push(this.genRandomNewPiece());
-        }
-        this.holdPiece = old;
-        this.place(this.livePiece);
-        this.resetTouch();
+        this.listenerHandler.registeredTouch = false;
     }
     hardDrop()
     {
@@ -337,7 +336,7 @@ class Field{
         this.touchMoveCount = 0;
         this.deltaTouch = 0;
         this.place(this.livePiece);
-        this.resetTouch();
+        this.listenerHandler.registeredTouch = false;
     }
     moveDown()
     {
