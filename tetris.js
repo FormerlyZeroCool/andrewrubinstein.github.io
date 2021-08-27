@@ -160,7 +160,7 @@ class Field{
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_hardDropPred(e), e => this.hardDrop());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_holdLivePred(e), e => this.holdLive());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_pausePred(e), e => this.active = !this.active);
-        
+        this.drawGrid = true;
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
@@ -585,9 +585,13 @@ class Field{
             {
                 const color = this.field[x + y*this.w].color;
                 this.ctx.fillStyle = color;
-                this.ctx.fillRect(x*width, y*height, width, height);
+                if(color != "#000000")
+                    this.ctx.fillRect(x*width+1, y*height+1, width-2, height-2);
+                else
+                    this.ctx.fillRect(x*width, y*height, width+1, height+1);
                 this.ctx.strokeStyle = "#FFFFFF";
-                this.ctx.strokeRect(x*width, y*height, width, height);
+                if(this.drawGrid)
+                    this.ctx.strokeRect(x*width, y*height, width, height);
                 if(color != "#000000")
                     this.ctx.strokeRect(x*width+width/4, y*height+height/4, width/2, height/2);
             }
@@ -617,9 +621,11 @@ class Field{
                     this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = hoffset+(height*5.2)*i+(height)*y;
-                    this.ctx.fillRect(gx, gy, width, height);
+                    if(color != "#000000")
+                        this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+                    else
+                        this.ctx.fillRect(gx, gy, width+1, height+1);
                     this.ctx.strokeStyle = "#FFFFFF";
-                    this.ctx.strokeRect(gx, gy, width, height);
                     if(color != "#000000")
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
                 }
@@ -640,9 +646,11 @@ class Field{
                     this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = 30+(height)*y;
-                    this.ctx.fillRect(gx, gy, width, height);
+                    if(color != "#000000")
+                        this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+                    else
+                        this.ctx.fillRect(gx, gy, width+1, height+1);
                     this.ctx.strokeStyle = "#FFFFFF";
-                    this.ctx.strokeRect(gx, gy, width, height);
                     if(color != "#000000")
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
                 }
@@ -864,7 +872,8 @@ async function main()
     let field = new Field(canvas, ctx, 15);
     canvas.addEventListener("click", (event) => field.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => field.onMouseMove(event) );
-
+    const gridToggleButton = document.getElementById("gridToggleButton");
+    gridToggleButton.addEventListener("click", event => field.drawGrid = !field.drawGrid);
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
