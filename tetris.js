@@ -558,6 +558,8 @@ class Field{
     {
         let width = this.boundedWidth/this.w;
         let height = this.boundedHeight/this.h;
+        this.ctx.fillStyle = "#000000";
+        this.ctx.fillRect(0, 0, this.boundedWidth, this.boundedHeight);
         for(let y = 0; y < this.h; y++)
         {
             for(let x = 0; x < this.w; x++)
@@ -569,8 +571,6 @@ class Field{
                     this.ctx.strokeStyle = "#000000";
                     this.ctx.strokeRect(x*width, y*height, width, height);
                 }
-                else
-                    this.ctx.fillRect(x*width+0.5, y*height+0.5, width+0.5, height+0.5);
                 this.ctx.strokeStyle = "#FFFFFF";
                 if(this.drawGrid)
                     this.ctx.strokeRect(x*width, y*height, width, height);
@@ -595,25 +595,26 @@ class Field{
             const piece = {type:this.pieceQueue.get(i).type,center:[2,2], vectors:this.pieceQueue.get(i).vectors, color:this.pieceQueue.get(i).color};
             
             this.placeAny(piece, field, 5);
+            this.ctx.fillStyle = "#000000";
+            this.ctx.fillRect(this.boundedWidth+5, hoffset+(height*5.2)*i, width*5, height*5);
             for(let y = 0; y < 5; y++)
             {
                 for(let x = 0; x < 5; x++)
                 {
                     const color = field[x + y*5].color;
-                    this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = hoffset+(height*5.2)*i+(height)*y;
                     if(color != "#000000"){
+                        this.ctx.fillStyle = color;
                         this.ctx.fillRect(gx, gy, width, height);
 
                         this.ctx.strokeStyle = "#000000";
                         this.ctx.strokeRect(gx, gy, width, height);
-                    }
-                    else
-                        this.ctx.fillRect(gx, gy, width+1, height+1);
-                    this.ctx.strokeStyle = "#FFFFFF";
-                    if(color != "#000000")
+
+
+                        this.ctx.strokeStyle = "#FFFFFF";
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                    }
                 }
             }
 
@@ -624,25 +625,24 @@ class Field{
             const piece = {type:this.holdPiece.type,center:[2,2], vectors:this.holdPiece.vectors, color:this.holdPiece.color};
             
             this.placeAny(piece, field, 5);
+            this.ctx.fillStyle = "#000000";
+            this.ctx.fillRect(this.boundedWidth+5, 30, width*5, height*5);
             for(let y = 0; y < 5; y++)
             {
                 for(let x = 0; x < 5; x++)
                 {
                     const color = field[x + y*5].color;
-                    this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = 30+(height)*y;
                     if(color != "#000000"){
+                        this.ctx.fillStyle = color;
                         this.ctx.fillRect(gx, gy, width, height);
 
                         this.ctx.strokeStyle = "#000000";
                         this.ctx.strokeRect(gx, gy, width, height);
-                    }
-                    else
-                        this.ctx.fillRect(gx, gy, width+1, height+1);
-                    this.ctx.strokeStyle = "#FFFFFF";
-                    if(color != "#000000")
+                        this.ctx.strokeStyle = "#FFFFFF";
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                    }
                 }
             }
         if(!this.active)
