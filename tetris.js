@@ -135,6 +135,7 @@ class Field{
         
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
+        this.liveBlocked = false;
         this.field = [];
         this.pieceQueue = new Queue(5);
         for(let i = 0; i < this.pieceQueue.data.length; i++)
@@ -504,9 +505,10 @@ class Field{
         if(this.isClearBelow(this.livePiece))
         {
             //move piece down one 
+            this.liveBlocked = false;
             this.livePiece.center[1] += 1;
         }
-        else//otherwise place the current piece back on the field then draw new piece from queue
+        else if (this.liveBlocked)//otherwise place the current piece back on the field then draw new piece from queue
         {
             //place current piece onto screen
             this.place(this.livePiece);
@@ -538,6 +540,11 @@ class Field{
                 //reset game
                 this.gameOver();
             }
+            this.liveBlocked = false;
+        }
+        else
+        {
+            this.liveBlocked = true;
         }
         //place current live piece onto the field for drawing
         if(this.livePiece)
