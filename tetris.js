@@ -155,7 +155,6 @@ class Field{
     {
         this.projectedLandingPiece = this.clonePiece(this.livePiece);
         this.clear(this.livePiece);
-        this.projectedLandingPiece.color = "#000000";
         while(this.isClearBelow(this.projectedLandingPiece) && this.projectedLandingPiece.center[1] < this.h)
         {
             this.projectedLandingPiece.center[1]++;
