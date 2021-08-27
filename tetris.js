@@ -215,7 +215,7 @@ class Field{
     }
     touchend_rotatePred(event)
     {
-        return this.active && event.avgVelocity <= 30 && event.mag < 15 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] < this.boundedWidth;
+        return this.active && event.mag < 20 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] < this.boundedWidth;
     }
     touchend_pausePred(event)
     {
