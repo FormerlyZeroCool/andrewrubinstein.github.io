@@ -220,7 +220,7 @@ class Field{
     touchend_pausePred(event)
     {
         //tap registered
-        return (event.avgVelocity <= 30 && event.timeDelayFromStartToEnd < 250 && event.timeDelayFromStartToEnd > 50 && event.touchPos[0] > this.boundedWidth);
+        return (event.mag < 14 && event.timeDelayFromStartToEnd < 250 && event.timeDelayFromStartToEnd > 50 && event.touchPos[0] > this.boundedWidth);
     }
     touchend_hardDropPred(event)
     {
