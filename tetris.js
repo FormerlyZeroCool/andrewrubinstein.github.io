@@ -69,7 +69,7 @@ class Field{
         this.drawGrid = false;
         this.holdToggle = true;
         this.holdLimitToggle = true;
-        this.showProjectedLanding = false;
+        this.showProjectedLanding = true;
         this.showPieceQueue = true;
         this.projectedLandingPiece;
         this.score = 0;
