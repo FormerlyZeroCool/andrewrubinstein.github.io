@@ -574,6 +574,21 @@ class Field{
         let height = this.boundedHeight/this.h;
         this.ctx.fillStyle = "#000000";
         this.ctx.fillRect(0, 0, this.boundedWidth, this.boundedHeight);
+        if(this.showProjectedLanding)
+        {
+            this.calcProjectedLanding();
+            //if(this.livePiece.center[0] != this.projectedLandingPiece.center[0] || this.livePiece.center[1] != this.projectedLandingPiece.center[1])
+                for(let i = 0; i < this.projectedLandingPiece.vectors.length; i++)
+                {
+                    const vector = this.projectedLandingPiece.vectors[i];
+                    const gx = Math.floor((this.projectedLandingPiece.center[0] + vector[0])*this.boundedWidth/this.w);
+                    const gy = Math.floor((this.projectedLandingPiece.center[1] + vector[1])*this.boundedHeight/this.h);
+                    this.ctx.strokeStyle = "#FFFFFF";
+                    this.ctx.strokeRect(gx, gy, width, height);
+                    this.ctx.strokeStyle =this.projectedLandingPiece.color;
+                    this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                }
+        }
         for(let y = 0; y < this.h; y++)
         {
             for(let x = 0; x < this.w; x++)
@@ -592,21 +607,6 @@ class Field{
                 if(color != "#000000")
                     this.ctx.strokeRect(x*width+width/4, y*height+height/4, width/2, height/2);
             }
-        }
-        if(this.showProjectedLanding)
-        {
-            this.calcProjectedLanding();
-            //if(this.livePiece.center[0] != this.projectedLandingPiece.center[0] || this.livePiece.center[1] != this.projectedLandingPiece.center[1])
-                for(let i = 0; i < this.projectedLandingPiece.vectors.length; i++)
-                {
-                    const vector = this.projectedLandingPiece.vectors[i];
-                    const gx = Math.floor((this.projectedLandingPiece.center[0] + vector[0])*this.boundedWidth/this.w);
-                    const gy = Math.floor((this.projectedLandingPiece.center[1] + vector[1])*this.boundedHeight/this.h);
-                    this.ctx.strokeStyle = "#FFFFFF";
-                    logToServer({proj:this.projectedLandingPiece.center,live:this.livePiece.center});
-                    this.ctx.strokeRect(gx, gy, width, height);
-                    this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
-                }
         }
         width -= width/3;
         height -= height/3;
