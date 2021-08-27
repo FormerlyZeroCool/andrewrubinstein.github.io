@@ -160,7 +160,7 @@ class Field{
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_hardDropPred(e), e => this.hardDrop());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_holdLivePred(e), e => this.holdLive());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_pausePred(e), e => this.active = !this.active);
-        this.drawGrid = true;
+        this.drawGrid = false;
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
