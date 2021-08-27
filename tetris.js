@@ -368,7 +368,7 @@ class Field{
             {
                 this.moveDown();
             }
-            else if(event.code == "KeyR")//Hold piece implementation
+            else if(event.code == "KeyR" || event.code == "KeyC")//Hold piece implementation
             {
                 this.holdLive();
             }
