@@ -188,7 +188,7 @@ class Field{
     }
     touchend_rotatePred(event)
     {
-        return this.active && event.mag < 14 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] < this.boundedWidth;
+        return this.active && event.mag < 5 && event.timeDelayFromStartToEnd < 250 && event.touchPos[0] < this.boundedWidth;
     }
     touchend_pausePred(event)
     {
@@ -610,7 +610,6 @@ class Field{
 
                         this.ctx.strokeStyle = "#000000";
                         this.ctx.strokeRect(gx, gy, width, height);
-
 
                         this.ctx.strokeStyle = "#FFFFFF";
                         this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
