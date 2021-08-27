@@ -3,35 +3,6 @@
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function mag(a)
-{
-    let sum = 0;
-    for(let i = 0; i < a.length; i++)
-    {
-        sum += a[i]*a[i];
-    }
-    return Math.sqrt(sum);
-}
-function normalize(a)
-{
-    const magA = this.mag(a);
-    for(let i = 0; i < a.length; i++)
-    {
-        a[i] /= magA;
-    }
-    return a;
-}
-function dotProduct(a, b)
-{
-    if(a.length != b.length)
-        return false;
-    let sum = 0;
-    for(let i = 0; i < a.length; i++)
-    {
-        sum += a[i]*b[i];
-    }
-    return sum;
-}
 class Queue {
     constructor(size)
     {
@@ -95,6 +66,7 @@ class Field{
         this.h = 25;
         this.mousePos = {x:0, y:0};
         this.active = true;
+        this.drawGrid = false;
         this.score = 0;
         this.level = 0;
         this.maxLevel = maxLevel+1;
@@ -160,7 +132,7 @@ class Field{
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_hardDropPred(e), e => this.hardDrop());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_holdLivePred(e), e => this.holdLive());
         this.listenerHandler.registerCallBack("touchend", e => this.touchend_pausePred(e), e => this.active = !this.active);
-        this.drawGrid = false;
+        
         this.holdPiece = {type:"null",center:[0,0],vectors:[], color:"#000000"};
         this.livePiece = this.genRandomNewPiece();
         this.field = [];
@@ -585,10 +557,13 @@ class Field{
             {
                 const color = this.field[x + y*this.w].color;
                 this.ctx.fillStyle = color;
-                if(color != "#000000")
+                if(color != "#000000"){
                     this.ctx.fillRect(x*width+1, y*height+1, width-2, height-2);
+                    this.ctx.strokeStyle = "#000000";
+                    this.ctx.strokeRect(x*width, y*height, width, height);
+                }
                 else
-                    this.ctx.fillRect(x*width, y*height, width+1, height+1);
+                    this.ctx.fillRect(x*width+0.5, y*height+0.5, width+0.5, height+0.5);
                 this.ctx.strokeStyle = "#FFFFFF";
                 if(this.drawGrid)
                     this.ctx.strokeRect(x*width, y*height, width, height);
@@ -621,8 +596,12 @@ class Field{
                     this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = hoffset+(height*5.2)*i+(height)*y;
-                    if(color != "#000000")
+                    if(color != "#000000"){
                         this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+
+                        this.ctx.strokeStyle = "#000000";
+                        this.ctx.strokeRect(gx, gy, width, height);
+                    }
                     else
                         this.ctx.fillRect(gx, gy, width+1, height+1);
                     this.ctx.strokeStyle = "#FFFFFF";
@@ -646,8 +625,12 @@ class Field{
                     this.ctx.fillStyle = color;
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = 30+(height)*y;
-                    if(color != "#000000")
+                    if(color != "#000000"){
                         this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+
+                        this.ctx.strokeStyle = "#000000";
+                        this.ctx.strokeRect(gx, gy, width, height);
+                    }
                     else
                         this.ctx.fillRect(gx, gy, width+1, height+1);
                     this.ctx.strokeStyle = "#FFFFFF";
@@ -664,35 +647,6 @@ class Field{
             this.ctx.strokeText('Game Paused', this.boundedWidth/2 - this.boundedWidth/4, this.boundedHeight/2);
         }
         
-    }
-    mag(a)
-    {
-        let sum = 0;
-        for(let i = 0; i < a.length; i++)
-        {
-            sum += a[i]*a[i];
-        }
-        return Math.sqrt(sum);
-    }
-    normalize(a)
-    {
-        const magA = this.mag(a);
-        for(let i = 0; i < a.length; i++)
-        {
-            a[i] /= magA;
-        }
-        return a;
-    }
-    dotProduct(a, b)
-    {
-        if(a.length != b.length)
-            return false;
-        let sum = 0;
-        for(let i = 0; i < a.length; i++)
-        {
-            sum += a[i]*b[i];
-        }
-        return sum;
     }
     resetTouch()
     {
