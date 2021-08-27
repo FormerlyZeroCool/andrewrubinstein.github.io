@@ -348,6 +348,7 @@ class Field{
     onKeyPress(event)
     {
         if(this.active)
+        {
             if(event.code === "Space")//Hard drop
             {
                 this.hardDrop();
@@ -372,10 +373,11 @@ class Field{
             {
                 this.holdLive();
             }
-            if(event.code === "KeyP")//pause/unpause
-            {
-                this.active = !this.active;
-            }
+        }
+        if(event.code === "KeyP")//pause/unpause
+        {
+            this.active = !this.active;
+        }
     }
     clear(piece)
     {
