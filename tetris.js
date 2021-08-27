@@ -70,6 +70,7 @@ class Field{
         this.holdToggle = true;
         this.holdLimitToggle = true;
         this.showProjectedLanding = false;
+        this.showPieceQueue = true;
         this.projectedLandingPiece;
         this.score = 0;
         this.level = 0;
@@ -617,37 +618,43 @@ class Field{
         this.ctx.fillText('Score: '+this.score, 5+this.boundedWidth, 17+height*6.8);
         const levelText = this.level === (this.maxLevel-1)?"Max":this.level;
         this.ctx.fillText('Level: '+levelText, 5+this.boundedWidth, 17+height*6.8+20);
-        for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
+        if(this.showPieceQueue)
         {
-            let field = [];
-            for(let j = 0; j < 25; j++)
-                field.push({color:"#000000"});
-            const piece = {type:this.pieceQueue.get(i).type,center:[2,2], vectors:this.pieceQueue.get(i).vectors, color:this.pieceQueue.get(i).color};
-            
-            this.placeAny(piece, field, 5);
-            this.ctx.fillStyle = "#000000";
-            this.ctx.fillRect(this.boundedWidth+5, hoffset+(height*5.2)*i, width*5, height*5);
-            for(let y = 0; y < 5; y++)
+            for(let i = 0; i < this.pieceQueue.length && i < 5; i++)
             {
-                for(let x = 0; x < 5; x++)
+                let field = [];
+                for(let j = 0; j < 25; j++)
+                    field.push({color:"#000000"});
+                const piece = {type:this.pieceQueue.get(i).type,center:[2,2], vectors:this.pieceQueue.get(i).vectors, color:this.pieceQueue.get(i).color};
+                
+                this.placeAny(piece, field, 5);
+                this.ctx.fillStyle = "#000000";
+                this.ctx.fillRect(this.boundedWidth+5, hoffset+(height*5.2)*i, width*5, height*5);
+                for(let y = 0; y < 5; y++)
                 {
-                    const color = field[x + y*5].color;
-                    const gx = this.boundedWidth+5+(width)*x;
-                    const gy = hoffset+(height*5.2)*i+(height)*y;
-                    if(color != "#000000"){
-                        this.ctx.fillStyle = color;
-                        this.ctx.fillRect(gx, gy, width, height);
-
-                        this.ctx.strokeStyle = "#000000";
-                        this.ctx.strokeRect(gx, gy, width, height);
-
-                        this.ctx.strokeStyle = "#FFFFFF";
-                        this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                    for(let x = 0; x < 5; x++)
+                    {
+                        const color = field[x + y*5].color;
+                        const gx = this.boundedWidth+5+(width)*x;
+                        const gy = hoffset+(height*5.2)*i+(height)*y;
+                        if(color != "#000000"){
+                            this.ctx.fillStyle = color;
+                            this.ctx.fillRect(gx, gy, width, height);
+    
+                            this.ctx.strokeStyle = "#000000";
+                            this.ctx.strokeRect(gx, gy, width, height);
+    
+                            this.ctx.strokeStyle = "#FFFFFF";
+                            this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                        }
                     }
                 }
+    
             }
-
         }
+
+        if(this.holdToggle)
+        {
             let field = [];
             for(let j = 0; j < 25; j++)
                 field.push({color:"#000000"});
@@ -674,6 +681,8 @@ class Field{
                     }
                 }
             }
+        }
+            
         if(!this.active)
         {
             this.ctx.font = '48px Calibri';
@@ -887,6 +896,11 @@ async function main()
     projectedLandingToggle.addEventListener("click", event => {field.showProjectedLanding = !field.showProjectedLanding; 
         toggleBackgroundColorButton(projectedLandingToggle, field.showProjectedLanding);});
     toggleBackgroundColorButton(projectedLandingToggle, field.showProjectedLanding);
+
+    const pieceQueueShowingToggleButton = document.getElementById("pieceQueueShowingToggleButton");
+    pieceQueueShowingToggleButton.addEventListener("click", event => {field.showPieceQueue = !field.showPieceQueue; 
+        toggleBackgroundColorButton(pieceQueueShowingToggleButton, field.showPieceQueue);});
+    toggleBackgroundColorButton(pieceQueueShowingToggleButton, field.showPieceQueue);
 
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
