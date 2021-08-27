@@ -67,6 +67,10 @@ class Field{
         this.mousePos = {x:0, y:0};
         this.active = true;
         this.drawGrid = false;
+        this.holdToggle = true;
+        this.holdLimitToggle = true;
+        this.showProjectedLanding = false;
+        this.projectedLandingPiece;
         this.score = 0;
         this.level = 0;
         this.maxLevel = maxLevel+1;
@@ -146,7 +150,18 @@ class Field{
         {
             this.field.push({color:"#000000"});
         }
-    }    
+    }  
+    calcProjectedLanding()
+    {
+        this.projectedLandingPiece = this.clonePiece(this.livePiece);
+        this.clear(this.livePiece);
+        this.projectedLandingPiece.color = "#000000";
+        while(this.isClearBelow(this.projectedLandingPiece) && this.projectedLandingPiece.center[1] < this.h)
+        {
+            this.projectedLandingPiece.center[1]++;
+        }
+        this.place(this.livePiece);
+    }  
     hSlide(event)
     {
         this.piecePosAtTouchStart[0] += event.deltaX*1.3;
@@ -274,7 +289,7 @@ class Field{
     }
     holdLive()
     {
-        if(!this.livePiece.swapped)
+        if((!this.livePiece.swapped || !this.holdLimitToggle) && this.holdToggle)
         {
             this.clear(this.livePiece);
             const type = this.livePiece.type;
@@ -293,8 +308,8 @@ class Field{
             }
             this.livePiece.swapped = true;
             this.place(this.livePiece);
+            this.listenerHandler.registeredTouch = false;
         }
-        this.listenerHandler.registeredTouch = false;
     }
     hardDrop()
     {
@@ -566,6 +581,7 @@ class Field{
             {
                 const color = this.field[x + y*this.w].color;
                 this.ctx.fillStyle = color;
+                
                 if(color != "#000000"){
                     this.ctx.fillRect(x*width, y*height, width, height);
                     this.ctx.strokeStyle = "#000000";
@@ -577,6 +593,21 @@ class Field{
                 if(color != "#000000")
                     this.ctx.strokeRect(x*width+width/4, y*height+height/4, width/2, height/2);
             }
+        }
+        if(this.showProjectedLanding)
+        {
+            this.calcProjectedLanding();
+            //if(this.livePiece.center[0] != this.projectedLandingPiece.center[0] || this.livePiece.center[1] != this.projectedLandingPiece.center[1])
+                for(let i = 0; i < this.projectedLandingPiece.vectors.length; i++)
+                {
+                    const vector = this.projectedLandingPiece.vectors[i];
+                    const gx = Math.floor((this.projectedLandingPiece.center[0] + vector[0])*this.boundedWidth/this.w);
+                    const gy = Math.floor((this.projectedLandingPiece.center[1] + vector[1])*this.boundedHeight/this.h);
+                    this.ctx.strokeStyle = "#FFFFFF";
+                    logToServer({proj:this.projectedLandingPiece.center,live:this.livePiece.center});
+                    this.ctx.strokeRect(gx, gy, width, height);
+                    this.ctx.strokeRect(gx+width/4, gy+height/4, width/2, height/2);
+                }
         }
         width -= width/3;
         height -= height/3;
@@ -819,6 +850,13 @@ class SingleTouchListener
         return a[0]*b[0]+a[1]*b[1];
     }
 }
+function toggleBackgroundColorButton(button, selected)
+{
+    if(selected)
+        button.style.background = "#8080D0";
+    else
+        button.style.background = "#808080";
+}
 async function main()
 {
    
@@ -833,7 +871,24 @@ async function main()
     canvas.addEventListener("click", (event) => field.onClickField(event) );
     canvas.addEventListener("mousemove",(event) => field.onMouseMove(event) );
     const gridToggleButton = document.getElementById("gridToggleButton");
-    gridToggleButton.addEventListener("click", event => field.drawGrid = !field.drawGrid);
+    gridToggleButton.addEventListener("click", event => {field.drawGrid = !field.drawGrid; toggleBackgroundColorButton(gridToggleButton, field.drawGrid);});
+    toggleBackgroundColorButton(gridToggleButton, field.drawGrid);
+    
+    const holdToggleButton = document.getElementById("holdToggleButton");
+    holdToggleButton.addEventListener("click", event => {field.holdToggle = !field.holdToggle; 
+        toggleBackgroundColorButton(holdToggleButton, field.holdToggle);});
+    toggleBackgroundColorButton(holdToggleButton, field.holdToggle);
+
+    const holdLimitToggle = document.getElementById("holdLimitButton");
+    holdLimitToggle.addEventListener("click", event => {field.holdLimitToggle = !field.holdLimitToggle; 
+        toggleBackgroundColorButton(holdLimitToggle, field.holdLimitToggle);});
+    toggleBackgroundColorButton(holdLimitToggle, field.holdLimitToggle);
+
+    const projectedLandingToggle = document.getElementById("projectedLandingToggleButton");
+    projectedLandingToggle.addEventListener("click", event => {field.showProjectedLanding = !field.showProjectedLanding; 
+        toggleBackgroundColorButton(projectedLandingToggle, field.showProjectedLanding);});
+    toggleBackgroundColorButton(projectedLandingToggle, field.showProjectedLanding);
+
     window.addEventListener('keydown', function(e) {
         if((e.keyCode == 32 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) && e.target == document.body) {
           e.preventDefault();
