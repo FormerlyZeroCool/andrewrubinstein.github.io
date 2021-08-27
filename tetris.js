@@ -565,7 +565,7 @@ class Field{
                 const color = this.field[x + y*this.w].color;
                 this.ctx.fillStyle = color;
                 if(color != "#000000"){
-                    this.ctx.fillRect(x*width+1, y*height+1, width-2, height-2);
+                    this.ctx.fillRect(x*width, y*height, width, height);
                     this.ctx.strokeStyle = "#000000";
                     this.ctx.strokeRect(x*width, y*height, width, height);
                 }
@@ -604,7 +604,7 @@ class Field{
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = hoffset+(height*5.2)*i+(height)*y;
                     if(color != "#000000"){
-                        this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+                        this.ctx.fillRect(gx, gy, width, height);
 
                         this.ctx.strokeStyle = "#000000";
                         this.ctx.strokeRect(gx, gy, width, height);
@@ -633,7 +633,7 @@ class Field{
                     const gx = this.boundedWidth+5+(width)*x;
                     const gy = 30+(height)*y;
                     if(color != "#000000"){
-                        this.ctx.fillRect(gx+1, gy+1, width-2, height-2);
+                        this.ctx.fillRect(gx, gy, width, height);
 
                         this.ctx.strokeStyle = "#000000";
                         this.ctx.strokeRect(gx, gy, width, height);
