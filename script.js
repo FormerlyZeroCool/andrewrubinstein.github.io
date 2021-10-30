@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded',() => {
     includeHTML('partials/navigation');
     includeHTML('partials/contact');
     includeHTML('partials/gtag');
+    includeHTML('partials/search');
     updateDataInclude();
     addAnalyticsToHead();
 })
