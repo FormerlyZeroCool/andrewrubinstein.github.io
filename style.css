@@ -453,3 +453,84 @@
 .list {
 	list-style-type: none;
 }
+
+body {
+	font-family: Arial, sans-serif;
+	margin: 20px;
+	line-height: 1.6;
+}
+h2 {
+	color: #fffdfd;
+}
+p {
+	font-size: 1rem;
+	margin-bottom: 20px;
+}
+ul {
+	list-style: none;
+	padding: 0;
+}
+li {
+	margin-bottom: 20px;
+}
+.listbutton {
+	text-decoration: none;
+	color: #007bff;
+}
+.listbutton:hover {
+	text-decoration: underline;
+}
+.iframe-container {
+	margin-bottom: 40px;
+}
+iframe {
+	width: 100%;
+	height: 400px;
+	border: none;
+}
+table {
+	width: 100%;
+	margin-bottom: 40px;
+	border-collapse: collapse;
+}
+th, td {
+	padding: 10px;
+	border: 1px solid #ddd;
+	text-align: center;
+}
+.project-item {
+	padding: 10px;
+	margin: 10px 0;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	background-color: rgba(0, 0, 0, 0.7);
+	transition: background-color 0.3s ease;
+  }
+  .project-item:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+  }
+  .alt-project-item {
+	  padding: 10px;
+	  margin: 10px 0;
+	  border: 1px solid #ccc;
+	  border-radius: 5px;
+	  background-color: rgba(0, 0, 0, 0.7);
+	  transition: background-color 0.3s ease;
+	}
+	.alt-project-item:hover {
+	  background-color: rgba(255, 255, 255, 0.4);
+	}
+  .listbutton {
+	text-decoration: none;
+	color: #d2d2d2;
+  }
+  .listbutton:hover {
+	color: #0073e6;
+  }
+  .listbutton h3 {
+	margin: 0;
+	font-size: 1.2em;
+  }
+  .iframe-container {
+	margin: 20px 0;
+  }
