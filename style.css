@@ -528,7 +528,7 @@ th, td {
 	  transition: background-color 0.3s ease;
 	}
 	.alt-project-item:hover {
-	  background-color: rgba(255, 255, 255, 0.4);
+	  background-color: rgba(255, 255, 255, 0.2);
 	}
   .listbutton {
 	text-decoration: none;
